@@ -1,5 +1,5 @@
 <?php
-require_once 'ChatBot.php';
+require_once 'controllers/ChatBot.php';
 $bot = new ChatBot();
 
 $input = $_GET['sted'] ?? '';
@@ -10,7 +10,7 @@ $response = $input ? $bot->respond($input) : "Hei 👋! Skriv inn et sted, så f
 <head>
   <meta charset="UTF-8">
   <title>Værassistent</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>
   <div class="chat">
