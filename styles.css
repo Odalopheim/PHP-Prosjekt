@@ -1,0 +1,18 @@
+body {
+  font-family: sans-serif;
+  max-width: 600px;
+  margin: 2em auto;
+  padding: 1em;
+  background: #f0f8ff;
+}
+input {
+  padding: 0.5em;
+  width: 70%;
+}
+button {
+  padding: 0.5em;
+}
+p {
+  margin-top: 1em;
+  font-size: 1.2em;
+}
