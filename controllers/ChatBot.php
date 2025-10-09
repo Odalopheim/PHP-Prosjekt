@@ -1,6 +1,6 @@
 <?php
-require_once 'geoCoder.php';
-require_once 'weatherService.php';
+require_once 'models/GeoCoder.php';
+require_once 'models/WeatherService.php';
 
 class ChatBot {
     public function respond($input) {
