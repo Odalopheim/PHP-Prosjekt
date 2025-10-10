@@ -3,7 +3,7 @@
 
 # PHP-Prosjekt
 Models (modell)
-
+</br>
 Hva det er:
 Her ligger all logikken for data og regler.
 
@@ -17,7 +17,8 @@ Funksjoner for å hente, lagre, oppdatere og slette data.
 
 Kort sagt:
 Alt som handler om data og forretningslogikk
-
+</br>
+Views
 
 Dette er det brukeren ser – altså grensesnittet (HTML-sider eller JSON-data for API).
 
@@ -29,7 +30,7 @@ Presentasjonslogikk (hvordan data vises)
 
 Kort sagt:
 Alt som handler om utseende og presentasjon.
-
+</br>
 Controllers (kontrollere)
 
 Hva det er:
