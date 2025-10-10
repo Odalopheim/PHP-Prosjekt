@@ -8,17 +8,29 @@ class Conversation
      */
     public static function saveMessage($userInput, $botResponse)
     {
-        $db = Database::connect();
+        // Input validation: ensure neither input is empty
+        if (empty($userInput) || empty($botResponse)) {
+            // Optionally, you could throw an exception or log this event
+            return false;
+        }
 
-        $stmt = $db->prepare("
-            INSERT INTO conversations (user_input, bot_response)
-            VALUES (:user_input, :bot_response)
-        ");
+        try {
+            $db = Database::connect();
 
-        $stmt->execute([
-            ':user_input' => $userInput,
-            ':bot_response' => $botResponse
-        ]);
+            $stmt = $db->prepare("
+                INSERT INTO conversations (user_input, bot_response)
+                VALUES (:user_input, :bot_response)
+            ");
+
+            $stmt->execute([
+                ':user_input' => $userInput,
+                ':bot_response' => $botResponse
+            ]);
+            return true;
+        } catch (Exception $e) {
+            // Optionally, log the error message: error_log($e->getMessage());
+            return false;
+        }
     }
 
     /**
