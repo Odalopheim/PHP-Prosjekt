@@ -98,3 +98,19 @@
     button:hover {
       background: #0d8c6c;
     }
+
+    /* Auth pages */
+    .auth-box {
+      background: #343541;
+      padding: 1.2em;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 420px;
+      text-align: left;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    .auth-box h1 { text-align: center; margin-top: 0; }
+    .auth-box label { display: block; margin-bottom: 0.6em; }
+    .auth-box input { width: 100%; padding: 0.5em; border-radius: 6px; border: 1px solid #2f2f36; background: transparent; color: #fff; }
+    .auth-box .error { background: #7a2b2b; color: #fff; padding: 0.6em; border-radius: 6px; margin-bottom: 0.8em; }
