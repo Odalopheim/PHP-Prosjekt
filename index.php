@@ -24,7 +24,6 @@ $conversations = Conversation::getAllMessages();
 <body>
   <a href="logout.php" class="logout-btn">Logg ut</a>
   <div class="chat">
-  <div class="chat">
     <h1>🌤️ Værassistent</h1>
       <div class="messages">
        

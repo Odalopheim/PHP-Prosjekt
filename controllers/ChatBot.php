@@ -9,21 +9,21 @@ class ChatBot {
         $place = trim($input);
         if (!$place) return "Skriv inn et sted for å få værdata.";
 
-        // 🔍 Hent koordinater
+        // Hent koordinater
         $coords = GeoCoder::getCoordinates($place);
         if (!$coords) return "Beklager, jeg fant ikke stedet '$place'.";
 
-        // 🌦️ Hent værdata
+        // Hent værdata
         $weather = WeatherService::getWeather($coords['lat'], $coords['lon']);
         if (!$weather) return "Kunne ikke hente værdata for $place.";
 
-        // ✍️ Lag svaret
+        // Lag svaret
         $response = "Været i $place nå: {$weather['temperature']}°C, vind: {$weather['wind']} m/s, fuktighet: {$weather['humidity']}%.";
 
-        // 💾 Lagre samtalen i databasen
+        // Lagre samtalen i databasen
         Conversation::saveMessage($place, $response);
 
-        // 📤 Returner svaret til visningen
+        // Returner svaret til visningen
         return $response;
     }
 }
