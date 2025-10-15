@@ -4,7 +4,7 @@ require_once 'models/Database.php';
 class Conversation
 {
     /**
-     * 💾 Lagre en samtale (brukerinput + botens svar)
+     * Lagre en samtale (brukerinput + botens svar)
      */
     public static function saveMessage($userInput, $botResponse)
     {
@@ -34,7 +34,7 @@ class Conversation
     }
 
     /**
-     * 📜 Hent alle tidligere samtaler (nyeste først)
+     * Hent alle tidligere samtaler (nyeste først)
      */
     public static function getAllMessages()
     {
@@ -50,7 +50,7 @@ class Conversation
     }
 
     /**
-     * 🧹 (Valgfritt) Tøm hele samtaleloggen
+     * Tøm hele samtaleloggen
      */
     public static function clearAll()
     {

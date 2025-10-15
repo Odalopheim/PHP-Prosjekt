@@ -64,3 +64,25 @@ Ikoner, fonter, osv.
 
 Kort sagt:
 Alt som er statisk innhold tilgjengelig for brukeren. 
+
+
+CREATE TABLE conversations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_input TEXT NOT NULL,
+    bot_response TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Brukertabell for autentisering
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+Instruksjoner:
+- Opprett databasen som `chatbot` eller oppdater `models/Database.php` med egne DB-innstillinger.
+- Kjør SQL-en over for å lage `conversations` og `users` tabellene.
+

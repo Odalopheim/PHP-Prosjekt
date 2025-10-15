@@ -9,7 +9,8 @@ class Database {
     public static function connect() {
         $dsn = "mysql:host=" . self::$host . ";dbname=" . self::$db . ";charset=" . self::$charset;
         try {
-            $pdo = new PDO($dsn, self::$user, self::$pass);
+            //$pdo = new PDO($dsn, self::$user, self::$pass);
+            $pdo = new PDO("mysql:host=localhost;port=3307;dbname=chatbot", "root", "");
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
         } catch (PDOException $e) {
