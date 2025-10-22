@@ -1,5 +1,6 @@
 <?php
 class Database {
+
     // Databasekonfigurasjon
     private static $host = 'localhost';
     private static $db   = 'chatbot';
@@ -14,8 +15,10 @@ class Database {
      * @return PDO  Returnerer et PDO-objekt ved vellykket tilkobling.
      */
     public static function connect() {
+
         // Data Source Name (DSN) – spesifiserer database-driver, vert og navn
         $dsn = "mysql:host=" . self::$host . ";dbname=" . self::$db . ";charset=" . self::$charset;
+
 
         try {
             //for de som bruker annen port enn standard 3306
@@ -30,6 +33,7 @@ class Database {
         } catch (PDOException $e) {
             // Unngå å vise detaljerte feilmeldinger til brukere av sikkerhetsårsaker
             die('Database connection failed.');
+
         }
     }
 }

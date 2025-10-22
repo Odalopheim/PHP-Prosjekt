@@ -7,7 +7,7 @@ if (empty($_SESSION['user_id'])) {
   exit;
 }
 
-require_once 'controllers/ChatBot.php';
+require_once __DIR__ . '/controllers/ChatBot.php';
 $bot = new ChatBot();
 
 $input = $_GET['sted'] ?? '';
@@ -22,7 +22,8 @@ $conversations = Conversation::getAllMessages();
     <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>
-  <a href="logout.php" class="logout-btn">Logg ut</a>
+  <a href="views/logout.php" class="logout-btn">Logg ut</a>
+  
   <div class="chat">
     <h1>🌤️ Værassistent</h1>
       <div class="messages">
