@@ -11,7 +11,7 @@ require_once __DIR__ . '/controllers/ChatBot.php';
 $bot = new ChatBot();
 
 $input = $_GET['sted'] ?? '';
-$response = $input ? $bot->respond($input) : "Hei 👋! Skriv inn et sted, så forteller jeg deg været der.";
+$response = $input ? $bot->respond($input) : "Hei! Skriv inn et sted, så forteller jeg deg været der.";
 $conversations = Conversation::getAllMessages();
 ?>
 <!DOCTYPE html>
@@ -25,11 +25,11 @@ $conversations = Conversation::getAllMessages();
   <a href="views/logout.php" class="logout-btn">Logg ut</a>
   
   <div class="chat">
-    <h1>🌤️ Værassistent</h1>
+    <h1>Værassistent</h1>
       <div class="messages">
        
   <!-- Knapp for å vise/skjule tidligere samtaler -->
-  <button id="showPrev" type="button" onclick="toggleMessages()">📜 Vis tidligere samtaler</button>
+  <button id="showPrev" type="button" onclick="toggleMessages()">Vis tidligere samtaler</button>
 
   <!-- Tidligere samtaler ligger skjult til knappen trykkes -->
   <div id="previous" style="display:none; margin-top: 10px;">
