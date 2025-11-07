@@ -1,12 +1,28 @@
 <?php
-class Database {
+require_once __DIR__ . '/../config.php';
 
-    // Databasekonfigurasjon
-    private static $host = 'localhost';
-    private static $db   = 'chatbot';
-    private static $user = 'root';
-    private static $pass = '';
+class Database {
     private static $charset = 'utf8mb4';
+
+    public static function connect() {
+        // Hent verdier fra miljøvariabler
+        $host = DB_HOST;
+        $port = DB_PORT;
+        $db = DB_NAME;
+        $user = DB_USER;
+        $pass = DB_PASS;
+        
+        $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=" . self::$charset;
+
+        try {
+            $pdo = new PDO($dsn, $user, $pass);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $pdo;
+        } catch (PDOException $e) {
+            die('Database connection failed.');
+        }
+    }
+}
 
     /**
      * Oppretter og returnerer en PDO-tilkobling til databasen.
