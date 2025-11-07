@@ -1,7 +1,7 @@
 <?php
 
 // Inkluderer konfigurasjonsfilen der konstanter som MET_API_URL og USER_AGENT er definert
-require_once './config.php'; 
+require_once __DIR__ . '/../config.php';
 
 
 class WeatherService {

@@ -3,7 +3,7 @@ require_once __DIR__ . '/Database.php';
 
 class User {
     public static function findByEmail($email) {
-        //$pdo = Database::connect();
+        $pdo = Database::connect();
         $stmt = $pdo->prepare('
             SELECT * 
             FROM users 
@@ -21,7 +21,7 @@ class User {
 
         $hash = password_hash($password, PASSWORD_DEFAULT);
         
-        //$pdo = Database::connect();
+        $pdo = Database::connect();
         $stmt = $pdo->prepare('INSERT INTO users (name, email, password_hash, created_at) VALUES (:name, :email, :password_hash, NOW())');
         return $stmt->execute([
             ':name' => $name,
