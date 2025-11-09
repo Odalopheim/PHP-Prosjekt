@@ -33,7 +33,6 @@ if (file_exists($viewPath)) {
 $className = ucfirst($page);
 $controllerPaths = [
     __DIR__ . "/../controllers/{$className}.php",
-    __DIR__ . "/../app/controllers/{$className}.php",
 ];
 $loaded = false;
 foreach ($controllerPaths as $controllerPath) {
