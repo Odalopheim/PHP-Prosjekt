@@ -9,14 +9,7 @@ if (!empty($_SESSION['user_id'])) {
 $error = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_error']);
 ?>
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <meta charset="utf-8">
-  <title>Registrer</title>
-  <link rel="stylesheet" href="<?= htmlspecialchars($base) ?>/css/style.css">
-</head>
-<body>
+<?php include_once __DIR__ . '/header.php'; ?>
   <div class="auth-box">
     <h1>Registrer ny bruker</h1>
     <?php if ($error): ?>

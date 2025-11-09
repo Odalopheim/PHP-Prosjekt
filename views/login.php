@@ -11,14 +11,7 @@ if (!empty($_SESSION['user_id'])) {
 $error = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_error']);
 ?>
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <meta charset="utf-8">
-  <title>Logg inn</title>
-  <link rel="stylesheet" href="<?= htmlspecialchars($base) ?>/css/style.css">
-</head>
-<body>
+<?php include __DIR__  . '/header.php'; ?>
   <div class="auth-box">
     <h1>Logg inn</h1>
     <?php if ($error): ?>

@@ -9,8 +9,8 @@ define('BASE_URL', $scriptDir);
 // Hvitliste over sider som har egne kontrollere
 $controllerPages = ['chatbot', 'auth'];
 
-// Hvitliste over statiske visninger
-$viewPages = ['login', 'register', 'chatbot'];
+// Liste over statiske visninger
+$viewPages = ['login', 'register', 'chatbot', 'history'];
 
 // Bestem hvilken side som skal lastes
 $page = 'chatbot';
