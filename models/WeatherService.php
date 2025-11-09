@@ -1,18 +1,14 @@
 <?php
 
 // Inkluderer konfigurasjonsfilen der konstanter som MET_API_URL og USER_AGENT er definert
+<?php
 require_once __DIR__ . '/../config.php';
 
-
 class WeatherService {
-
-    // Henter værdata basert på breddegrad ($lat) og lengdegrad ($lon)
+    //hetner værdata fra MET API basert på latitude og longitude
     public static function getWeather($lat, $lon) {
-
-        // Bygger opp URL-en til MET API-et med oppgitte koordinater
         $url = MET_API_URL . "?lat=$lat&lon=$lon";
-
-        // Setter opp HTTP-header med User-Agent (påkrevd av MET API)
+        
         $opts = [
             'http' => [
                 'header' => "User-Agent: " . USER_AGENT
