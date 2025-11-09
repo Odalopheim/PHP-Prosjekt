@@ -1,6 +1,4 @@
-<?php
 
-// Inkluderer konfigurasjonsfilen der konstanter som MET_API_URL og USER_AGENT er definert
 <?php
 require_once __DIR__ . '/../config.php';
 
