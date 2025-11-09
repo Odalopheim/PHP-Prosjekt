@@ -1,5 +1,6 @@
 <?php
-require_once 'models/Database.php';
+// bruk __DIR__ for å sikre at inkludering er relativ til denne filens mappe
+require_once __DIR__ . '/Database.php';
 
 class Conversation
 {

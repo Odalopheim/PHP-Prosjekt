@@ -13,11 +13,11 @@ class Auth {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             // Redirect tilbake til prosjektets index (stamme-nivå)
-            header('Location: ../index.php');
+            header('Location: ../public/index.php?page=chatbot');
             exit;
         } else {
             $_SESSION['auth_error'] = 'Ugyldig e-post eller passord.';
-            header('Location: ../login.php');
+            header('Location: ../public/index.php?page=login');
             exit;
         }
     }
@@ -34,11 +34,11 @@ class Auth {
             $user = User::verifyCredentials($email, $password);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
-            header('Location: ../index.php');
+            header('Location: ../public/index.php?page=chatbot');
             exit;
         } else {
             $_SESSION['auth_error'] = 'Kunne ikke registrere brukeren. E-post kan allerede være i bruk.';
-            header('Location: ../register.php');
+            header('Location: ../public/index.php?page=register');
             exit;
         }
     }
@@ -47,7 +47,7 @@ class Auth {
         session_start();
         session_unset();
         session_destroy();
-        header('Location: ../login.php');
+        header('Location: ../public/index.php?page=login');
         exit;
     }
 }
