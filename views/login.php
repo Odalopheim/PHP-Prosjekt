@@ -31,4 +31,5 @@ unset($_SESSION['auth_error']);
     </form>
     <p>Ny bruker? <a href="<?= htmlspecialchars($base) ?>/index.php?page=register">Registrer deg</a></p>
   </div>
-<?php include_once __DIR__ . '/footer.php'; ?>
+<?php include __DIR__  . '/footer.php'; ?>
+
