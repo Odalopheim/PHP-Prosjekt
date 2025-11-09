@@ -1,0 +1,21 @@
+# Miljøvariabler og hemmeligheter
+.env
+
+# Konfigurasjonsfiler med sensitive data
+config.php
+
+# Database
+*.sql
+*.sqlite
+*.db
+
+# IDE-filer
+.vscode/
+.idea/
+
+# Mac/Windows
+.DS_Store
+Thumbs.db
+
+# Loggfiler
+*.log

@@ -1,13 +1,16 @@
 <?php
 session_start();
+// beregn base-URL: bruk definert BASE_URL fra front controller hvis tilgjengelig
+$base = defined('BASE_URL') ? BASE_URL : '/php/PHP-Prosjekt/public';
 
-// Hvis ikke innlogget: send til login-side
+// Hvis ikke innlogget: send til login-side via front controller
 if (empty($_SESSION['user_id'])) {
-  header('Location: login.php');
+  header('Location: ' . $base . '/index.php?page=login');
   exit;
 }
 
-require_once __DIR__ . '/controllers/ChatBot.php';
+// require ChatBot fra controllers-mappen (én nivå opp fra views)
+require_once __DIR__ . '/../controllers/ChatBot.php';
 $bot = new ChatBot();
 
 $input = $_GET['sted'] ?? '';
@@ -19,10 +22,10 @@ $conversations = Conversation::getAllMessages();
 <head>
   <meta charset="UTF-8">
   <title>Værassistent</title>
-    <link rel="stylesheet" href="public/css/style.css">
+  <link rel="stylesheet" href="<?= \htmlspecialchars($base) ?>/css/style.css">
 </head>
 <body>
-  <a href="views/logout.php" class="logout-btn">Logg ut</a>
+  <a href="<?= \htmlspecialchars($base) ?>/auth.php?action=logout" class="logout-btn">Logg ut</a>
   
   <div class="chat">
     <h1>Værassistent</h1>
@@ -53,6 +56,9 @@ $conversations = Conversation::getAllMessages();
       <button>Send</button>
     </form>
   </div>
-   <script src="public/js/script.js"></script>
-</body>
-</html>
+  <script src="<?= \htmlspecialchars($base) ?>/js/script.js"></script>
+<?php
+// inkluder footer som har closing tags
+include_once __DIR__ . '/footer.php';
+
+?>
