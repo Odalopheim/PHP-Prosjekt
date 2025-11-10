@@ -10,7 +10,7 @@ define('BASE_URL', $scriptDir);
 $controllerPages = ['chatbot', 'auth'];
 
 // Liste over statiske visninger
-$viewPages = ['login', 'register', 'chatbot', 'history'];
+$viewPages = ['login', 'register', 'chatbot', 'history', 'admin_messages'];
 
 // Bestem hvilken side som skal lastes
 $page = 'chatbot';

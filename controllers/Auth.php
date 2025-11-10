@@ -12,6 +12,15 @@ class Auth {
             // Sett session og redirect
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
+            // Lagre brukerens epost i session for å knytte meldinger til epost
+            $_SESSION['user_email'] = $user['email'] ?? $email;
+            // Marker admin hvis epost slutter med @admin.no
+            if (self::isAdminEmail($user['email'])) {
+                $_SESSION['is_admin'] = true;
+                $_SESSION['admin_notice'] = 'Du er administrator.';
+            } else {
+                $_SESSION['is_admin'] = false;
+            }
             // Redirect tilbake til prosjektets index (stamme-nivå)
             header('Location: ../public/index.php?page=chatbot');
             exit;
@@ -34,6 +43,15 @@ class Auth {
             $user = User::verifyCredentials($email, $password);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
+            // Lagre brukerens epost i session for å knytte meldinger til epost
+            $_SESSION['user_email'] = $user['email'] ?? $email;
+            // Marker admin hvis epost slutter med @admin.no
+            if (self::isAdminEmail($user['email'])) {
+                $_SESSION['is_admin'] = true;
+                $_SESSION['admin_notice'] = 'Du er administrator.';
+            } else {
+                $_SESSION['is_admin'] = false;
+            }
             header('Location: ../public/index.php?page=chatbot');
             exit;
         } else {
@@ -50,7 +68,14 @@ class Auth {
         header('Location: ../public/index.php?page=login');
         exit;
     }
+
+    // Sjekk om epost tilhører admin-domene
+    private static function isAdminEmail(string $email): bool {
+        return preg_match('/@admin\.no$/i', $email) === 1;
+    }
 }
+
+
 // Enkel dispatcher slik at denne filen kan kalles direkte fra form action
 if (php_sapi_name() !== 'cli') {
     $action = $_GET['action'] ?? '';

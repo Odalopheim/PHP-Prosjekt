@@ -27,8 +27,14 @@ $currentPage = $_GET['page'] ?? '';
       <nav class="site-nav">
         <!-- sjekker om man er loggd in etter hvilken header man skal få -->
         <?php if ($isLoggedIn): ?>
-          <span style="margin-right:0.6rem;">Hei, <?= $userName ?></span>
+          <span class="greeting" style="margin-right:0.6rem;">Hei, <?= $userName ?></span>
+          <?php if (!empty($_SESSION['is_admin'])): ?>
+            <span class="admin-badge" title="Administrator">Admin</span>
+          <?php endif; ?>
           <a class="site-nav__link" href="<?= htmlspecialchars($base) ?>/auth.php?action=logout">Logg ut</a>
+          <?php if (!empty($_SESSION['is_admin'])): ?>
+            <a class="site-nav__link" href="<?= htmlspecialchars($base) ?>/index.php?page=admin_messages">Admin</a>
+          <?php endif; ?>
           <a class="site-nav__link" href="<?= htmlspecialchars($base) ?>/index.php?page=<?= $currentPage === 'history' ? 'chatbot' : 'history' ?>">
             <!-- sjekker om man er på history-siden for å bytte link-text -->
             <?= $currentPage === 'history' ? 'Chatbot' : 'Historie' ?>
@@ -41,3 +47,9 @@ $currentPage = $_GET['page'] ?? '';
       </nav>
     </div>
   </header>
+  <?php if (!empty($_SESSION['admin_notice'])): ?>
+    <div class="admin-notice" style="background:#fff3cd;border:1px solid #ffeeba;padding:0.5rem 1rem;margin:0.75rem auto;width:calc(100% - 2rem);max-width:1000px;border-radius:4px;color:#856404;">
+      <?= htmlspecialchars($_SESSION['admin_notice']) ?>
+    </div>
+    <?php unset($_SESSION['admin_notice']); ?>
+  <?php endif; ?>
