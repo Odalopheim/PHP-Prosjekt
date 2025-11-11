@@ -57,7 +57,7 @@ class ChatBot {
         }
 
         // Prøv siste two ord og siste ett ord (ofte sted uttrykk)
-        $words = preg_split('/\s+/u', $s);
+        $words = preg_split('/\s+/u', $sClean);
         $count = count($words);
         if ($count >= 2) {
             $candidates[] = $this->stripTimeWords($words[$count-2] . ' ' . $words[$count-1]);
