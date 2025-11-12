@@ -28,13 +28,7 @@ class Conversation
                     // Vi bruker en global variabel som settes av kallet som ønsker å lagre epost
                     ':user_email' => $GLOBALS['__conversation_user_email'] ?? null
                 ]);
-            } else {
-                $stmt = $db->prepare("INSERT INTO conversations (user_input, bot_response) VALUES (:user_input, :bot_response)");
-                $stmt->execute([
-                    ':user_input' => $userInput,
-                    ':bot_response' => $botResponse
-                ]);
-            }
+            } 
             return true;
         } catch (Exception $e) {
             // Optionally, log the error message: error_log($e->getMessage());
@@ -49,13 +43,27 @@ class Conversation
     {
         $db = Database::connect();
 
-        // Hvis user_email finnes i skjemaet, hent den også
-        if (self::hasColumn('user_email')) {
-            $sql = "SELECT user_input, bot_response, user_email, created_at FROM conversations ORDER BY created_at DESC";
-        } else {
-            $sql = "SELECT user_input, bot_response, NULL AS user_email, created_at FROM conversations ORDER BY created_at DESC";
+        // Hent e-postadressen til den innloggede brukeren
+        $userEmail = $_SESSION['user_email'] ?? null;
+
+        if (!$userEmail) {
+            // Ingen bruker er logget inn
+            return [];
         }
-        $stmt = $db->query($sql);
+
+        // hvis historikk til bruker
+        if (self::hasColumn('user_email')) {
+            $sql = "SELECT user_input, bot_response, user_email, created_at 
+                FROM conversations 
+                WHERE user_email = :user_email 
+                ORDER BY created_at DESC";
+        } else {
+            return [];  
+        }
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':user_email', $userEmail);
+        $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
