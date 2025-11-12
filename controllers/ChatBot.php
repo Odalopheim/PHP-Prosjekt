@@ -6,27 +6,58 @@ require_once __DIR__ . '/../models/Conversation.php';
 
 class ChatBot {
     public function respond($input) {
-        $place = trim($input);
-        if (!$place) return "Skriv inn et sted for å få værdata.";
+        $s = trim($input);
+        if ($s === '') return "Skriv inn et sted for å få værdata.";
 
-        // Hent koordinater
-        $coords = GeoCoder::getCoordinates($place);
-        if (!$coords) return "Beklager, jeg fant ikke stedet '$place'.";
+        // Generer kandidat-strenger fra setningen og prøv disse mot geokoder-APIet.
+        $candidates = $this->generatePlaceCandidates($s);
+        $coords = null;
+        $foundPlace = null;
+
+        $maxAttempts = 5;
+        $attempts = 0;
+        foreach ($candidates as $candidate) {
+            $candidate = trim($candidate);
+            if ($candidate === '') continue;
+            $attempts++;
+            if ($attempts > $maxAttempts) break;
+            $coords = GeoCoder::getCoordinates($candidate);
+            if ($coords) {
+                $foundPlace = $candidate;
+                break;
+            }
+        }
+
+        if (!$coords) {
+            // Ingen kandidater ga treff
+            return "Beklager, men hvilket sted mener du?";
+        }
 
         // Hent værdata
         $weather = WeatherService::getWeather($coords['lat'], $coords['lon']);
-        if (!$weather) return "Kunne ikke hente værdata for $place.";
+        if (!$weather) return "Kunne ikke hente værdata for {$foundPlace}.";
 
-        // Lag svaret
-        $response = "Været i $place nå: {$weather['temperature']}°C, vind: {$weather['wind']} m/s, fuktighet: {$weather['humidity']}%.";
+        // Lag svaret (bruk det funnede sted-navnet)
+        $responsePlace = $foundPlace ?? $s;
+        $response = "Været i {$responsePlace} nå: {$weather['temperature']}°C, vind: {$weather['wind']} m/s, fuktighet: {$weather['humidity']}%.";
 
-        // Lagre samtalen i databasen
-        Conversation::saveMessage($place, $response);
+        // Lagre samtalen i databasen. Hvis brukeren er logget inn, inkluder epost.
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+        $userEmail = $_SESSION['user_email'] ?? null;
+        if ($userEmail) {
+            // Sett global variabel som Conversation::saveMessage leser hvis kolonne finnes
+            $GLOBALS['__conversation_user_email'] = $userEmail;
+        }
+        Conversation::saveMessage($responsePlace, $response);
+        // Rydd opp global variabel
+        unset($GLOBALS['__conversation_user_email']);
 
         // Returner svaret til visningen
         return $response;
     }
- /**
+
+    /**
+
      * Generer kandidat-strenger som kan representere et sted fra en hel setning.
      * Prioriterer uttrykk etter preposisjoner og egennavn, deretter korte avslutninger
      * og som fallback hele setningen.
@@ -57,7 +88,9 @@ class ChatBot {
         }
 
         // Prøv siste two ord og siste ett ord (ofte sted uttrykk)
+
         $words = preg_split('/\s+/u', $sClean);
+
         $count = count($words);
         if ($count >= 2) {
             $candidates[] = $this->stripTimeWords($words[$count-2] . ' ' . $words[$count-1]);
@@ -89,6 +122,7 @@ class ChatBot {
      * Fjern tidsuttrykk og vanlige fyllord som ikke skal være med i stedssøk.
      */
     private function stripTimeWords(string $text): string {
+
         $pattern = '/\b(?:i morgen|imorgen|i dag|idag|nå|i kveld|ikveld|i natt|i morges|i går|igår|været|vær|temperatur|når|hvordan|blir|skal|regner)\b/iu';
 
         $clean = preg_replace($pattern, ' ', $text);
