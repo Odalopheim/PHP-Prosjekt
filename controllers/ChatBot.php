@@ -57,6 +57,7 @@ class ChatBot {
     }
 
     /**
+
      * Generer kandidat-strenger som kan representere et sted fra en hel setning.
      * Prioriterer uttrykk etter preposisjoner og egennavn, deretter korte avslutninger
      * og som fallback hele setningen.
@@ -87,7 +88,9 @@ class ChatBot {
         }
 
         // Prøv siste two ord og siste ett ord (ofte sted uttrykk)
-        $words = preg_split('/\s+/u', $s);
+
+        $words = preg_split('/\s+/u', $sClean);
+
         $count = count($words);
         if ($count >= 2) {
             $candidates[] = $this->stripTimeWords($words[$count-2] . ' ' . $words[$count-1]);
@@ -119,14 +122,10 @@ class ChatBot {
      * Fjern tidsuttrykk og vanlige fyllord som ikke skal være med i stedssøk.
      */
     private function stripTimeWords(string $text): string {
-        $patterns = [
-            '/\bi morgen\b/iu', '/\bimorgen\b/iu', '/\bi dag\b/iu', '/\bidag\b/iu',
-            '/\bnå\b/iu', '/\bi kveld\b/iu', '/\bikveld\b/iu', '/\bi natt\b/iu',
-            '/\bi morges\b/iu', '/\bi går\b/iu', '/\bigår\b/iu',
-            '/\bværet\b/iu', '/\bvær\b/iu', '/\btemperatur\b/iu', '/\bnår\b/iu',
-            '/\bhvordan\b/iu', '/\bblir\b/iu', '/\bskal\b/iu', '/\bregner\b/iu'
-        ];
-        $clean = preg_replace($patterns, ' ', $text);
+
+        $pattern = '/\b(?:i morgen|imorgen|i dag|idag|nå|i kveld|ikveld|i natt|i morges|i går|igår|været|vær|temperatur|når|hvordan|blir|skal|regner)\b/iu';
+
+        $clean = preg_replace($pattern, ' ', $text);
         $clean = preg_replace('/\s+/u', ' ', $clean);
         return trim($clean);
     }
