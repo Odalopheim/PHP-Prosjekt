@@ -1,66 +1,67 @@
 <?php
-// bruk __DIR__ for å sikre at inkludering er relativ til denne filens mappe
+// Bruk __DIR__ for å sikre at inkludering er relativ til denne filens mappe
 require_once __DIR__ . '/Database.php';
 
 class Conversation
 {
     /**
-     * Lagre en samtale (brukerinput + botens svar)
-     * Hvis `user_email`-kolonnen finnes i databasen, vil den også lagres.
+     * Lagre en samtale (brukerinput + botens svar).
+     * Hvis `user_email`-kolonnen finnes i databasen, lagres den også.
      */
-    public static function saveMessage($userInput, $botResponse)
+    public static function saveMessage(string $userInput, string $botResponse): bool
     {
-        // Input validation: ensure neither input is empty
+        // Valider input
         if (empty($userInput) || empty($botResponse)) {
-            // Optionally, you could throw an exception or log this event
             return false;
         }
 
         try {
             $db = Database::connect();
 
-            // Hvis `conversations`-tabellen har en user_email-kolonne, inkluder den
+            // Sjekk om tabellen har user_email-kolonnen
             if (self::hasColumn('user_email')) {
-                $stmt = $db->prepare("INSERT INTO conversations (user_input, bot_response, user_email) VALUES (:user_input, :bot_response, :user_email)");
+                $stmt = $db->prepare("
+                    INSERT INTO conversations (user_input, bot_response, user_email) 
+                    VALUES (:user_input, :bot_response, :user_email)
+                ");
                 $stmt->execute([
-                    ':user_input' => $userInput,
-                    ':bot_response' => $botResponse,
-                    // Vi bruker en global variabel som settes av kallet som ønsker å lagre epost
-                    ':user_email' => $GLOBALS['__conversation_user_email'] ?? null
+                    ':user_input'  => $userInput,
+                    ':bot_response'=> $botResponse,
+                    ':user_email'  => $GLOBALS['__conversation_user_email'] ?? null
                 ]);
-            } 
+            }
+
             return true;
         } catch (Exception $e) {
-            // Optionally, log the error message: error_log($e->getMessage());
+            // Du kan logge feilen her: error_log($e->getMessage());
             return false;
         }
     }
 
     /**
-     * Hent alle tidligere samtaler (nyeste først)
+     * Hent alle tidligere samtaler for innlogget bruker (nyeste først).
      */
-    public static function getAllMessages()
+    public static function getAllMessages(): array
     {
         $db = Database::connect();
 
-        // Hent e-postadressen til den innloggede brukeren
+        // Hent e-post fra session
         $userEmail = $_SESSION['user_email'] ?? null;
-
         if (!$userEmail) {
-            // Ingen bruker er logget inn
+            return []; // Ingen bruker logget inn
+        }
+
+        // Sjekk om tabellen har user_email-kolonnen
+        if (!self::hasColumn('user_email')) {
             return [];
         }
 
-        // hvis historikk til bruker
-        if (self::hasColumn('user_email')) {
-            $sql = "SELECT user_input, bot_response, user_email, created_at 
-                FROM conversations 
-                WHERE user_email = :user_email 
-                ORDER BY created_at DESC";
-        } else {
-            return [];  
-        }
-        $stmt = $db->prepare($sql);
+        $stmt = $db->prepare("
+            SELECT user_input, bot_response, user_email, created_at
+            FROM conversations
+            WHERE user_email = :user_email
+            ORDER BY created_at DESC
+        ");
         $stmt->bindParam(':user_email', $userEmail);
         $stmt->execute();
 
@@ -68,24 +69,33 @@ class Conversation
     }
 
     /**
-     * Tøm hele samtaleloggen
+     * Tøm hele samtaleloggen.
      */
-    public static function clearAll()
+    public static function clearAll(): void
     {
         $db = Database::connect();
         $db->exec("DELETE FROM conversations");
     }
 
-    // Sjekk om en kolonne finnes i conversations-tabellen
-    private static function hasColumn(string $column): bool {
+    /**
+     * Sjekk om en kolonne finnes i `conversations`-tabellen.
+     */
+    private static function hasColumn(string $column): bool
+    {
         try {
             $db = Database::connect();
-            $stmt = $db->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'conversations' AND COLUMN_NAME = :col");
+            $stmt = $db->prepare("
+                SELECT COUNT(*) 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                  AND TABLE_NAME = 'conversations' 
+                  AND COLUMN_NAME = :col
+            ");
             $stmt->execute([':col' => $column]);
+
             return (int)$stmt->fetchColumn() > 0;
         } catch (Exception $e) {
             return false;
         }
     }
 }
-
