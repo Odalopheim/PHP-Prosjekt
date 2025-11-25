@@ -18,18 +18,31 @@ class Conversation
         try {
             $db = Database::connect();
 
-            // Sjekk om tabellen har user_email-kolonnen
-            if (self::hasColumn('user_email')) {
-                $stmt = $db->prepare("
-                    INSERT INTO conversations (user_input, bot_response, user_email) 
-                    VALUES (:user_input, :bot_response, :user_email)
-                ");
-                $stmt->execute([
-                    ':user_input'  => $userInput,
-                    ':bot_response'=> $botResponse,
-                    ':user_email'  => $GLOBALS['__conversation_user_email'] ?? null
-                ]);
+            // Bygg dynamisk INSERT basert på hvilke kolonner som finnes
+            $columns = ['user_input', 'bot_response'];
+            $placeholders = [':user_input', ':bot_response'];
+            $params = [':user_input' => $userInput, ':bot_response' => $botResponse];
+
+            if (self::hasColumn('user_id')) {
+                $columns[] = 'user_id';
+                $placeholders[] = ':user_id';
+                $params[':user_id'] = $GLOBALS['__conversation_user_id'] ?? null;
             }
+
+            if (self::hasColumn('user_email')) {
+                $columns[] = 'user_email';
+                $placeholders[] = ':user_email';
+                $params[':user_email'] = $GLOBALS['__conversation_user_email'] ?? null;
+            }
+
+            $sql = sprintf(
+                "INSERT INTO conversations (%s) VALUES (%s)",
+                implode(', ', $columns),
+                implode(', ', $placeholders)
+            );
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
 
             return true;
         } catch (Exception $e) {
@@ -39,33 +52,47 @@ class Conversation
     }
 
     /**
-     * Hent alle tidligere samtaler for innlogget bruker (nyeste først).
+     * Hent alle samtaler (nyeste først). Brukes av admin-visninger.
      */
     public static function getAllMessages(): array
     {
         $db = Database::connect();
 
-        // Hent e-post fra session
-        $userEmail = $_SESSION['user_email'] ?? null;
-        if (!$userEmail) {
-            return []; // Ingen bruker logget inn
-        }
+        $cols = 'user_input, bot_response, created_at';
+        if (self::hasColumn('user_email')) $cols .= ', user_email';
+        if (self::hasColumn('user_id')) $cols .= ', user_id';
 
-        // Sjekk om tabellen har user_email-kolonnen
-        if (!self::hasColumn('user_email')) {
-            return [];
-        }
-
-        $stmt = $db->prepare("
-            SELECT user_input, bot_response, user_email, created_at
-            FROM conversations
-            WHERE user_email = :user_email
-            ORDER BY created_at DESC
-        ");
-        $stmt->bindParam(':user_email', $userEmail);
+        $stmt = $db->prepare("SELECT $cols FROM conversations ORDER BY created_at DESC");
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Hent meldinger for en gitt bruker-ID (bruker visning av historikk)
+     */
+    public static function getMessagesForUserById(int $userId): array
+    {
+        $db = Database::connect();
+
+        // Hvis tabellen har user_id, filtrer på den
+        if (self::hasColumn('user_id')) {
+            $stmt = $db->prepare("SELECT user_input, bot_response, created_at, user_id, user_email FROM conversations WHERE user_id = :uid ORDER BY created_at DESC");
+            $stmt->execute([':uid' => $userId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Fallback: hvis user_email finnes og ligger i session, bruk epost
+        if (self::hasColumn('user_email')) {
+            $email = $_SESSION['user_email'] ?? null;
+            if ($email) {
+                $stmt = $db->prepare("SELECT user_input, bot_response, created_at, user_email FROM conversations WHERE user_email = :email ORDER BY created_at DESC");
+                $stmt->execute([':email' => $email]);
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+        }
+
+        return [];
     }
 
     /**
