@@ -12,7 +12,6 @@ class Conversation
     {
         // Input validation: ensure neither input is empty
         if (empty($userInput) || empty($botResponse)) {
-            // Optionally, you could throw an exception or log this event
             return false;
         }
 
@@ -21,7 +20,9 @@ class Conversation
 
             // Hvis `conversations`-tabellen har en user_email-kolonne, inkluder den
             if (self::hasColumn('user_email')) {
-                $stmt = $db->prepare("INSERT INTO conversations (user_input, bot_response, user_email) VALUES (:user_input, :bot_response, :user_email)");
+                $stmt = $db->prepare(
+                    "INSERT INTO conversations (user_input, bot_response, user_email) 
+                    VALUES (:user_input, :bot_response, :user_email)");
                 $stmt->execute([
                     ':user_input' => $userInput,
                     ':bot_response' => $botResponse,
@@ -43,22 +44,38 @@ class Conversation
     {
         $db = Database::connect();
 
+        // Finn ut om brukeren er admin
+        $isAdmin = $_SESSION['is_admin'] ?? false;
+
         // Hent e-postadressen til den innloggede brukeren
         $userEmail = $_SESSION['user_email'] ?? null;
 
-        if (!$userEmail) {
-            // Ingen bruker er logget inn
+        // sjekker at kolonne har mail
+        if (!self::hasColumn('user_email')) {
             return [];
         }
 
-        // hvis historikk til bruker
-        if (self::hasColumn('user_email')) {
+        // hvis admin hent alle samtaler
+        if ($isAdmin) {
+        $sql = "SELECT user_input, bot_response, user_email, created_at
+                FROM conversations
+                ORDER BY created_at DESC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+        // Ingen bruker logget inn
+        if (!$userEmail) {
+            return [];
+        }
+
+        // vis egen historikk til bruker
+        if ($userEmail) {
             $sql = "SELECT user_input, bot_response, user_email, created_at 
                 FROM conversations 
                 WHERE user_email = :user_email 
                 ORDER BY created_at DESC";
-        } else {
-            return [];  
         }
         $stmt = $db->prepare($sql);
         $stmt->bindParam(':user_email', $userEmail);
@@ -80,7 +97,11 @@ class Conversation
     private static function hasColumn(string $column): bool {
         try {
             $db = Database::connect();
-            $stmt = $db->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'conversations' AND COLUMN_NAME = :col");
+            $stmt = $db->prepare(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                AND TABLE_NAME = 'conversations' 
+                AND COLUMN_NAME = :col");
             $stmt->execute([':col' => $column]);
             return (int)$stmt->fetchColumn() > 0;
         } catch (Exception $e) {
