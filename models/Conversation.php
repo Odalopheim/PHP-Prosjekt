@@ -1,16 +1,16 @@
 <?php
-// bruk __DIR__ for å sikre at inkludering er relativ til denne filens mappe
+// Bruk __DIR__ for å sikre at inkludering er relativ til denne filens mappe
 require_once __DIR__ . '/Database.php';
 
 class Conversation
 {
     /**
-     * Lagre en samtale (brukerinput + botens svar)
-     * Hvis `user_email`-kolonnen finnes i databasen, vil den også lagres.
+     * Lagre en samtale (brukerinput + botens svar).
+     * Hvis `user_email`-kolonnen finnes i databasen, lagres den også.
      */
-    public static function saveMessage($userInput, $botResponse)
+    public static function saveMessage(string $userInput, string $botResponse): bool
     {
-        // Input validation: ensure neither input is empty
+        // Valider input
         if (empty($userInput) || empty($botResponse)) {
             return false;
         }
@@ -18,7 +18,17 @@ class Conversation
         try {
             $db = Database::connect();
 
-            // Hvis `conversations`-tabellen har en user_email-kolonne, inkluder den
+            // Bygg dynamisk INSERT basert på hvilke kolonner som finnes
+            $columns = ['user_input', 'bot_response'];
+            $placeholders = [':user_input', ':bot_response'];
+            $params = [':user_input' => $userInput, ':bot_response' => $botResponse];
+
+            if (self::hasColumn('user_id')) {
+                $columns[] = 'user_id';
+                $placeholders[] = ':user_id';
+                $params[':user_id'] = $GLOBALS['__conversation_user_id'] ?? null;
+            }
+
             if (self::hasColumn('user_email')) {
                 $stmt = $db->prepare(
                     "INSERT INTO conversations (user_input, bot_response, user_email) 
@@ -32,15 +42,15 @@ class Conversation
             } 
             return true;
         } catch (Exception $e) {
-            // Optionally, log the error message: error_log($e->getMessage());
+            // Du kan logge feilen her: error_log($e->getMessage());
             return false;
         }
     }
 
     /**
-     * Hent alle tidligere samtaler (nyeste først)
+     * Hent alle samtaler (nyeste først). Brukes av admin-visninger.
      */
-    public static function getAllMessages()
+    public static function getAllMessages(): array
     {
         $db = Database::connect();
 
@@ -77,24 +87,24 @@ class Conversation
                 WHERE user_email = :user_email 
                 ORDER BY created_at DESC";
         }
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam(':user_email', $userEmail);
-        $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return [];
     }
 
     /**
-     * Tøm hele samtaleloggen
+     * Tøm hele samtaleloggen.
      */
-    public static function clearAll()
+    public static function clearAll(): void
     {
         $db = Database::connect();
         $db->exec("DELETE FROM conversations");
     }
 
-    // Sjekk om en kolonne finnes i conversations-tabellen
-    private static function hasColumn(string $column): bool {
+    /**
+     * Sjekk om en kolonne finnes i `conversations`-tabellen.
+     */
+    private static function hasColumn(string $column): bool
+    {
         try {
             $db = Database::connect();
             $stmt = $db->prepare(
@@ -103,10 +113,10 @@ class Conversation
                 AND TABLE_NAME = 'conversations' 
                 AND COLUMN_NAME = :col");
             $stmt->execute([':col' => $column]);
+
             return (int)$stmt->fetchColumn() > 0;
         } catch (Exception $e) {
             return false;
         }
     }
 }
-

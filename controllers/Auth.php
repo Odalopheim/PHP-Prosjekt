@@ -1,11 +1,16 @@
 <?php
 require_once __DIR__ . '/../models/User.php';
 
-class Auth {
-
-    public static function handleLogin() {
+class Auth
+{
+    /**
+     * Håndter innlogging.
+     */
+    public static function handleLogin(): void
+    {
         session_start();
-        $email = $_POST['email'] ?? '';
+
+        $email    = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
 
         $user = User::verifyCredentials($email, $password);
@@ -37,10 +42,15 @@ class Auth {
         exit;
     }
 
-    public static function handleRegister() {
+    /**
+     * Håndter registrering.
+     */
+    public static function handleRegister(): void
+    {
         session_start();
-        $name = trim($_POST['name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+
+        $name     = trim($_POST['name'] ?? '');
+        $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         
         // Bestem rolle fra epost
@@ -48,7 +58,7 @@ class Auth {
         
         $ok = User::register($name, $email, $password, $role);
         if ($ok) {
-            // Etter registrering, logg inn automatisk
+            // Automatisk innlogging etter registrering
             $user = User::verifyCredentials($email, $password);
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
@@ -61,6 +71,7 @@ class Auth {
             if ($_SESSION['is_admin']) {
             $_SESSION['admin_notice'] = 'Du er administrator.';
             }
+
             header('Location: ../public/index.php?page=chatbot');
             exit;
             } else {
@@ -70,7 +81,11 @@ class Auth {
             }
     }
 
-    public static function logout() {
+    /**
+     * Logg ut bruker.
+     */
+    public static function logout(): void
+    {
         session_start();
         session_unset();
         session_destroy();
@@ -82,8 +97,11 @@ class Auth {
         exit;
     }
 
-    // Sjekk om epost tilhører admin-domene
-    private static function isAdminEmail(string $email): bool {
+    /**
+     * Sjekk om e-post tilhører admin-domene.
+     */
+    private static function isAdminEmail(string $email): bool
+    {
         return preg_match('/@admin\.no$/i', $email) === 1;
     } 
 }
@@ -91,13 +109,12 @@ class Auth {
 // Enkel dispatcher slik at denne filen kan kalles direkte fra form action
 if (php_sapi_name() !== 'cli') {
     $action = $_GET['action'] ?? '';
+
     if ($action === 'login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         Auth::handleLogin();
-    }
-    if ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    } elseif ($action === 'register' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         Auth::handleRegister();
-    }
-    if ($action === 'logout') {
+    } elseif ($action === 'logout') {
         Auth::logout();
     }
 }
