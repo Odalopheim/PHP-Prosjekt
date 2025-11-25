@@ -30,20 +30,16 @@ class Conversation
             }
 
             if (self::hasColumn('user_email')) {
-                $columns[] = 'user_email';
-                $placeholders[] = ':user_email';
-                $params[':user_email'] = $GLOBALS['__conversation_user_email'] ?? null;
-            }
-
-            $sql = sprintf(
-                "INSERT INTO conversations (%s) VALUES (%s)",
-                implode(', ', $columns),
-                implode(', ', $placeholders)
-            );
-
-            $stmt = $db->prepare($sql);
-            $stmt->execute($params);
-
+                $stmt = $db->prepare(
+                    "INSERT INTO conversations (user_input, bot_response, user_email) 
+                    VALUES (:user_input, :bot_response, :user_email)");
+                $stmt->execute([
+                    ':user_input' => $userInput,
+                    ':bot_response' => $botResponse,
+                    // Vi bruker en global variabel som settes av kallet som ønsker å lagre epost
+                    ':user_email' => $GLOBALS['__conversation_user_email'] ?? null
+                ]);
+            } 
             return true;
         } catch (Exception $e) {
             // Du kan logge feilen her: error_log($e->getMessage());
@@ -58,38 +54,38 @@ class Conversation
     {
         $db = Database::connect();
 
-        $cols = 'user_input, bot_response, created_at';
-        if (self::hasColumn('user_email')) $cols .= ', user_email';
-        if (self::hasColumn('user_id')) $cols .= ', user_id';
+        // Finn ut om brukeren er admin
+        $isAdmin = $_SESSION['is_admin'] ?? false;
 
-        $stmt = $db->prepare("SELECT $cols FROM conversations ORDER BY created_at DESC");
-        $stmt->execute();
+        // Hent e-postadressen til den innloggede brukeren
+        $userEmail = $_SESSION['user_email'] ?? null;
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Hent meldinger for en gitt bruker-ID (bruker visning av historikk)
-     */
-    public static function getMessagesForUserById(int $userId): array
-    {
-        $db = Database::connect();
-
-        // Hvis tabellen har user_id, filtrer på den
-        if (self::hasColumn('user_id')) {
-            $stmt = $db->prepare("SELECT user_input, bot_response, created_at, user_id, user_email FROM conversations WHERE user_id = :uid ORDER BY created_at DESC");
-            $stmt->execute([':uid' => $userId]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // sjekker at kolonne har mail
+        if (!self::hasColumn('user_email')) {
+            return [];
         }
 
-        // Fallback: hvis user_email finnes og ligger i session, bruk epost
-        if (self::hasColumn('user_email')) {
-            $email = $_SESSION['user_email'] ?? null;
-            if ($email) {
-                $stmt = $db->prepare("SELECT user_input, bot_response, created_at, user_email FROM conversations WHERE user_email = :email ORDER BY created_at DESC");
-                $stmt->execute([':email' => $email]);
-                return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }
+        // hvis admin hent alle samtaler
+        if ($isAdmin) {
+        $sql = "SELECT user_input, bot_response, user_email, created_at
+                FROM conversations
+                ORDER BY created_at DESC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+        // Ingen bruker logget inn
+        if (!$userEmail) {
+            return [];
+        }
+
+        // vis egen historikk til bruker
+        if ($userEmail) {
+            $sql = "SELECT user_input, bot_response, user_email, created_at 
+                FROM conversations 
+                WHERE user_email = :user_email 
+                ORDER BY created_at DESC";
         }
 
         return [];
@@ -111,13 +107,11 @@ class Conversation
     {
         try {
             $db = Database::connect();
-            $stmt = $db->prepare("
-                SELECT COUNT(*) 
-                FROM INFORMATION_SCHEMA.COLUMNS 
+            $stmt = $db->prepare(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
                 WHERE TABLE_SCHEMA = DATABASE() 
-                  AND TABLE_NAME = 'conversations' 
-                  AND COLUMN_NAME = :col
-            ");
+                AND TABLE_NAME = 'conversations' 
+                AND COLUMN_NAME = :col");
             $stmt->execute([':col' => $column]);
 
             return (int)$stmt->fetchColumn() > 0;

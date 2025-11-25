@@ -14,27 +14,29 @@ class Auth
         $password = $_POST['password'] ?? '';
 
         $user = User::verifyCredentials($email, $password);
-
+        
+        //sjekker om bruker har for mange innloggingsforsøk og gir tilbakemelding
+        if ($user === 'locked') {
+            $_SESSION['auth_error'] = 'For mange mislykkede innloggingsforsøk. Bruker er låst i 1 time.';
+            header('Location: ../public/index.php?page=login');
+            exit;
+        }
         if ($user) {
-            // Sett session-variabler
-            $_SESSION['user_id']    = $user['id'];
-            $_SESSION['user_name']  = $user['name'];
+            // Sett session og redirect
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
+            
+            // Lagre brukerens epost i session for å knytte meldinger til epost
             $_SESSION['user_email'] = $user['email'] ?? $email;
-
-            // Marker admin hvis e-post slutter med @admin.no
-            if (self::isAdminEmail($user['email'])) {
-                $_SESSION['is_admin']      = true;
-                $_SESSION['admin_notice']  = 'Du er administrator.';
-            } else {
-                $_SESSION['is_admin'] = false;
+            
+            // Bruk rolle fra Database
+            $_SESSION['is_admin'] = (isset($user['role']) && $user['role'] === 'Admin');
+            if ($_SESSION['is_admin']) {
+                $_SESSION['admin_notice'] = 'Du er administrator.';
             }
-
-            // Redirect til chatbot
             header('Location: ../public/index.php?page=chatbot');
             exit;
         }
-
-        // Ugyldig innlogging
         $_SESSION['auth_error'] = 'Ugyldig e-post eller passord.';
         header('Location: ../public/index.php?page=login');
         exit;
@@ -50,32 +52,33 @@ class Auth
         $name     = trim($_POST['name'] ?? '');
         $email    = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
-
-        $ok = User::register($name, $email, $password);
-
+        
+        // Bestem rolle fra epost
+        $role = self::isAdminEmail($email) ? 'Admin' : 'Standard';
+        
+        $ok = User::register($name, $email, $password, $role);
         if ($ok) {
             // Automatisk innlogging etter registrering
             $user = User::verifyCredentials($email, $password);
-
-            $_SESSION['user_id']    = $user['id'];
-            $_SESSION['user_name']  = $user['name'];
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_name'] = $user['name'];
+            
+            // Lagre brukerens epost i session for å knytte meldinger til epost
             $_SESSION['user_email'] = $user['email'] ?? $email;
-
-            if (self::isAdminEmail($user['email'])) {
-                $_SESSION['is_admin']     = true;
-                $_SESSION['admin_notice'] = 'Du er administrator.';
-            } else {
-                $_SESSION['is_admin'] = false;
+            
+            // hvis admin rolle bli logget inn som Administrator
+            $_SESSION['is_admin'] = (isset($user['role']) && $user['role'] === 'Admin');
+            if ($_SESSION['is_admin']) {
+            $_SESSION['admin_notice'] = 'Du er administrator.';
             }
 
             header('Location: ../public/index.php?page=chatbot');
             exit;
-        }
-
-        // Registrering feilet
-        $_SESSION['auth_error'] = 'Kunne ikke registrere brukeren. E-post kan allerede være i bruk.';
-        header('Location: ../public/index.php?page=register');
-        exit;
+            } else {
+                $_SESSION['auth_error'] = 'Kunne ikke registrere brukeren. E-post kan allerede være i bruk.';
+                header('Location: ../public/index.php?page=register');
+                exit;
+            }
     }
 
     /**
@@ -87,6 +90,9 @@ class Auth
         session_unset();
         session_destroy();
 
+        session_start(); // må starte ny session for å lagre melding
+        $_SESSION['auth_message'] = 'Du er nå logget ut.';
+        
         header('Location: ../public/index.php?page=login');
         exit;
     }
@@ -97,7 +103,7 @@ class Auth
     private static function isAdminEmail(string $email): bool
     {
         return preg_match('/@admin\.no$/i', $email) === 1;
-    }
+    } 
 }
 
 // Enkel dispatcher slik at denne filen kan kalles direkte fra form action

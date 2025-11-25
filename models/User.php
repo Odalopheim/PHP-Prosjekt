@@ -24,7 +24,7 @@ class User
     /**
      * Registrer en ny bruker.
      */
-    public static function register(string $name, string $email, string $password): bool
+    public static function register(string $name, string $email, string $password, enum $role): bool
     {
         // Enkel validering
         if (empty($name) || empty($email) || empty($password)) {
@@ -106,13 +106,12 @@ class User
     {
         try {
             $pdo = Database::connect();
-            $stmt = $pdo->prepare("
-                SELECT COUNT(*) 
+            $stmt = $pdo->prepare(
+                "SELECT COUNT(*) 
                 FROM INFORMATION_SCHEMA.COLUMNS 
                 WHERE TABLE_SCHEMA = DATABASE() 
-                  AND TABLE_NAME = 'users' 
-                  AND COLUMN_NAME = :col
-            ");
+                AND TABLE_NAME = 'users' 
+                AND COLUMN_NAME = :col");
             $stmt->execute([':col' => $column]);
 
             return (int)$stmt->fetchColumn() > 0;
