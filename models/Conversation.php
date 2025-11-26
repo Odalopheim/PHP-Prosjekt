@@ -57,8 +57,6 @@ class Conversation
         // Finn ut om brukeren er admin
         $isAdmin = $_SESSION['is_admin'] ?? false;
 
-        // Hent e-postadressen til den innloggede brukeren
-        $userEmail = $_SESSION['user_email'] ?? null;
 
         // sjekker at kolonne har mail
         if (!self::hasColumn('user_email')) {
@@ -75,20 +73,39 @@ class Conversation
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-        // Ingen bruker logget inn
+    return [];
+}   
+    public static function getMessagesForUserById(): array {
+
+        $db = Database::connect();
+
+        // Hent e-postadressen til den innloggede brukeren
+        $userEmail = $_SESSION['user_email'] ?? null;
+
+        // sjekker at kolonne har mail
+        if (!self::hasColumn('user_email')) {
+            return [];
+        }
+        
         if (!$userEmail) {
             return [];
         }
 
         // vis egen historikk til bruker
         if ($userEmail) {
-            $sql = "SELECT user_input, bot_response, user_email, created_at 
+              $sql = "SELECT user_input, bot_response, user_email, created_at 
                 FROM conversations 
                 WHERE user_email = :user_email 
                 ORDER BY created_at DESC";
-        }
 
-        return [];
+        } else {
+            return [];  
+        }
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':user_email', $userEmail);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
