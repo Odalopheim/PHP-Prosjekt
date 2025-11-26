@@ -4,41 +4,99 @@ require_once __DIR__ . '/../models/User.php';
 class Auth
 {
     /**
+     * Start session med trygge cookie-params om session ikke allerede er startet.
+     */
+    private static function ensureSession(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            // Disse parametrene krever at applikasjonen kjører over HTTPS i produksjon
+            $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => $secure,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+            session_start();
+        }
+    }
+
+    /**
+     * En liten hjelper for redirect med feilmelding
+     */
+    private static function redirectWithError(string $page, string $message): void
+    {
+        $_SESSION['auth_error'] = $message;
+        header('Location: ../public/index.php?page=' . $page);
+        exit;
+    }
+
+    /**
+     * CSRF-validering. Returnerer true hvis ok.
+     */
+    private static function validateCsrf(): bool
+    {
+        // Forutsetter at skjemaet sender feltet "csrf" og at token er generert i visningen
+        $tokenSession = $_SESSION['csrf'] ?? '';
+        $tokenPost = $_POST['csrf'] ?? '';
+        if (empty($tokenSession) || empty($tokenPost)) {
+            return false;
+        }
+        return hash_equals($tokenSession, $tokenPost);
+    }
+
+    /**
      * Håndter innlogging.
      */
     public static function handleLogin(): void
     {
-        session_start();
+        self::ensureSession();
 
-        $email    = $_POST['email'] ?? '';
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            self::redirectWithError('login', 'Ugyldig forespørsel.');
+        }
+
+        if (!self::validateCsrf()) {
+            self::redirectWithError('login', 'Sikkerhetsfeil. Last inn siden på nytt.');
+        }
+
+        $email = trim((string)($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
 
+        if ($email === '' || $password === '') {
+            self::redirectWithError('login', 'Alle felt må fylles ut.');
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            self::redirectWithError('login', 'Ugyldig e-postformat.');
+        }
+
         $user = User::verifyCredentials($email, $password);
-        
-        //sjekker om bruker har for mange innloggingsforsøk og gir tilbakemelding
+
+        // Sjekk om bruker er låst (User::verifyCredentials bør returnere string 'locked' ved sperring)
         if ($user === 'locked') {
-            $_SESSION['auth_error'] = 'For mange mislykkede innloggingsforsøk. Bruker er låst i 1 time.';
-            header('Location: ../public/index.php?page=login');
-            exit;
+            self::redirectWithError('login', 'For mange mislykkede innloggingsforsøk. Bruker er midlertidig sperret.');
         }
-        if ($user) {
-            // Sett session og redirect
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            
-            // Lagre brukerens epost i session for å knytte meldinger til epost
-            $_SESSION['user_email'] = $user['email'] ?? $email;
-            
-            // Bruk rolle fra Database
-            $_SESSION['is_admin'] = (isset($user['role']) && $user['role'] === 'Admin');
-            if ($_SESSION['is_admin']) {
-                $_SESSION['admin_notice'] = 'Du er administrator.';
-            }
-            header('Location: ../public/index.php?page=chatbot');
-            exit;
+
+        if ($user === false || !is_array($user)) {
+            // feil legitimasjon
+            self::redirectWithError('login', 'Ugyldig e-post eller passord.');
         }
-        $_SESSION['auth_error'] = 'Ugyldig e-post eller passord.';
-        header('Location: ../public/index.php?page=login');
+
+        // Vellykket innlogging — harden session
+        session_regenerate_id(true);
+
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['name'] ?? '';
+        $_SESSION['user_email'] = $user['email'] ?? $email;
+        $_SESSION['is_admin'] = (isset($user['role']) && $user['role'] === 'Admin');
+        if ($_SESSION['is_admin']) {
+            $_SESSION['admin_notice'] = 'Du er administrator.';
+        }
+
+        header('Location: ../public/index.php?page=chatbot');
         exit;
     }
 
@@ -47,38 +105,65 @@ class Auth
      */
     public static function handleRegister(): void
     {
-        session_start();
+        self::ensureSession();
 
-        $name     = trim($_POST['name'] ?? '');
-        $email    = trim($_POST['email'] ?? '');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            self::redirectWithError('register', 'Ugyldig forespørsel.');
+        }
+
+        if (!self::validateCsrf()) {
+            self::redirectWithError('register', 'Sikkerhetsfeil. Last inn siden på nytt.');
+        }
+
+        $name = trim((string)($_POST['name'] ?? ''));
+        $email = trim((string)($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
-        
-        // Bestem rolle fra epost
-        $role = self::isAdminEmail($email) ? 'Admin' : 'Standard';
-        // Registrer bruker
-        $register = User::register($name, $email, $password, $role);
-        if ($register) {
-            // Automatisk innlogging etter registrering
-            $user = User::verifyCredentials($email, $password);
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            
-            // Lagre brukerens epost i session for å knytte meldinger til epost
-            $_SESSION['user_email'] = $user['email'] ?? $email;
-            
-            // hvis admin rolle bli logget inn som Administrator
-            $_SESSION['is_admin'] = (isset($user['role']) && $user['role'] === 'Admin');
-            if ($_SESSION['is_admin']) {
-            $_SESSION['admin_notice'] = 'Du er administrator.';
-            }
 
-            header('Location: ../public/index.php?page=chatbot');
+        // Basis validering
+        if ($name === '' || $email === '' || $password === '') {
+            self::redirectWithError('register', 'Alle felt må fylles ut.');
+        }
+
+        if (strlen($name) < 2 || strlen($name) > 100) {
+            self::redirectWithError('register', 'Navn må være mellom 2 og 100 tegn.');
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            self::redirectWithError('register', 'Ugyldig e-postformat.');
+        }
+
+        if (strlen($password) < 8) {
+            self::redirectWithError('register', 'Passord må være minst 8 tegn.');
+        }
+
+        // Rolle: standard ved registrering. Admin-tilgang må settes manuelt i databasen av en administrator.
+        $role = 'Standard';
+
+        $register = User::register($name, $email, $password, $role);
+        if (!$register) {
+            self::redirectWithError('register', 'Kunne ikke registrere brukeren. E-post kan allerede være i bruk.');
+        }
+
+        // Ved suksess, logg brukeren inn automatisk
+        $user = User::verifyCredentials($email, $password);
+        if ($user === false || $user === 'locked' || !is_array($user)) {
+            // Dette er uventet (bruker nettopp opprettet) — informer og send til login
+            $_SESSION['auth_message'] = 'Registrering lykkes. Logg inn med dine detaljer.';
+            header('Location: ../public/index.php?page=login');
             exit;
-            } else {
-                $_SESSION['auth_error'] = 'Kunne ikke registrere brukeren. E-post kan allerede være i bruk.';
-                header('Location: ../public/index.php?page=register');
-                exit;
-            }
+        }
+
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['name'] ?? '';
+        $_SESSION['user_email'] = $user['email'] ?? $email;
+        $_SESSION['is_admin'] = (isset($user['role']) && $user['role'] === 'Admin');
+        if ($_SESSION['is_admin']) {
+            $_SESSION['admin_notice'] = 'Du er administrator.';
+        }
+
+        header('Location: ../public/index.php?page=chatbot');
+        exit;
     }
 
     /**
@@ -86,24 +171,34 @@ class Auth
      */
     public static function logout(): void
     {
-        session_start();
-        session_unset();
+        self::ensureSession();
+
+        // Tøm session sikkert
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params['path'], $params['domain'], $params['secure'], $params['httponly']
+            );
+        }
         session_destroy();
 
-        session_start(); // må starte ny session for å lagre melding
+        // Ny session for melding
+        session_start();
         $_SESSION['auth_message'] = 'Du er nå logget ut.';
-        
+
         header('Location: ../public/index.php?page=login');
         exit;
     }
 
     /**
      * Sjekk om e-post tilhører admin-domene.
+     * Merk: denne funksjonen brukes ikke for automatisk admin-tilordning i denne versjonen.
      */
     private static function isAdminEmail(string $email): bool
     {
         return preg_match('/@admin\.no$/i', $email) === 1;
-    } 
+    }
 }
 
 // Enkel dispatcher slik at denne filen kan kalles direkte fra form action
