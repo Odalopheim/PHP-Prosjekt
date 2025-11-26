@@ -15,7 +15,7 @@ if (empty($_SESSION['is_admin'])) {
 $messages = Conversation::getAllMessages();
 ?>
 <div class="container">
-  <h2>Meldinger mottatt</h2>
+  <h2>Alle meldinger sendt inn</h2>
   <p>Totalt: <?= count($messages) ?> meldinger</p>
    <table class="admin-table">
     <thead>

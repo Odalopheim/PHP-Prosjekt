@@ -19,7 +19,7 @@ $conversations = Conversation::getMessagesForUserById();
 <?php include_once __DIR__ . '/header.php'; ?>
 
   <main style="width:100%;max-width:720px;margin:1rem auto;padding:0 1rem;box-sizing:border-box;">
-    <h1>Tidligere samtaler</h1>
+    <h1>Dine tidligere samtaler</h1>
     <?php if (empty($conversations)): ?>
       <p>Ingen tidligere samtaler funnet.</p>
     <?php else: ?>
