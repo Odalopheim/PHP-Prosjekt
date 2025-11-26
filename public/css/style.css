@@ -1,160 +1,159 @@
-    * {
-      box-sizing: border-box;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      padding: 0;
-      background: #202123;
-      color: #ECECF1;
-      font-family: "Inter", system-ui, sans-serif;
-      /* Gjør body til en kolonne-flex slik at footeren kan plasseres nederst */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      /* Sørg for plass til en fiksert footer */
-      padding-bottom: 4rem; /* tilpass etter footer-høyde */
-    }
+body {
+  margin: 0;
+  padding: 0 0 4rem 0;
+  background: #202123;
+  color: #ECECF1;
+  font-family: "Inter", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    .chat {
-      background: #343541;
-      border-radius: 12px;
-      padding: 1em;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 80vh;
-      /* Sørg for at .chat kan sentreres mellom topp og footer */
-      margin-top: auto;
-      margin-bottom: auto;
-    }
+h1 {
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 1em;
+}
 
-    h1 {
-      text-align: center;
-      font-weight: 500;
-      margin-bottom: 1em;
-    }
+.container {
+  max-width: 1100px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
 
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75em;
-      padding-bottom: 1em;
-    }
+/* Chat Layout */
 
-    .msg {
-      padding: 0.75em 1em;
-      border-radius: 10px;
-      max-width: 85%;
-      line-height: 1.4;
-      word-wrap: break-word;
-    }
+.chat {
+  background: #343541;
+  border-radius: 12px;
+  padding: 1em;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 80vh;
+  margin: auto 0;
+}
 
-    .msg.user {
-      background: #10A37F;
-      color: white;
-      align-self: flex-end;
-    }
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  padding-bottom: 1em;
+}
 
-    .msg.bot {
-      background: #444654;
-      color: #ECECF1;
-      align-self: flex-start;
-    }
+.msg {
+  padding: 0.75em 1em;
+  border-radius: 10px;
+  max-width: 85%;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
 
-    form {
-      display: flex;
-      gap: 0.5em;
-      background: #40414F;
-      padding: 0.6em;
-      border-radius: 10px;
-    }
+.msg.user {
+  background: #10A37F;
+  color: white;
+  align-self: flex-end;
+}
 
-    input {
-      flex: 1;
-      background: transparent;
-      color: white;
-      border: none;
-      padding: 0.6em;
-      font-size: 1em;
-      outline: none;
-    }
+.msg.bot {
+  background: #444654;
+  color: #ECECF1;
+  align-self: flex-start;
+}
 
-    input::placeholder {
-      color: #8e8ea0;
-    }
+form {
+  display: flex;
+  gap: 0.5em;
+  background: #40414F;
+  padding: 0.6em;
+  border-radius: 10px;
+}
 
-    button {
-      background: #10A37F;
-      color: white;
-      border: none;
-      padding: 0.6em 1em;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-      font-weight: bold;
-    }
+input {
+  flex: 1;
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 0.6em;
+  font-size: 1em;
+  outline: none;
+}
 
-    button:hover {
-      background: #0d8c6c;
-    }
+input::placeholder {
+  color: #8e8ea0;
+}
 
-    /* Auth pages */
-    .auth-box {
-      background: #343541;
-      padding: 1.2em;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 420px;
-      text-align: left;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      /* Samme oppførsel som .chat: sentreres og lar footeren være nederst */
-      margin-top: auto;
-      margin-bottom: auto;
-    }
+button {
+  background: #10A37F;
+  color: white;
+  border: none;
+  padding: 0.6em 1em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: bold;
+}
 
-    /* Footer styling */
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      transform: none;
-      z-index: 1000;
-      width: 100%;
-      /* fullbredde bakgrunn til kantene */
-      max-width: none;
-      text-align: center;
-      padding: 0.75rem 1rem;
-      color: #bfbfc6;
-      font-size: 0.9rem;
-      box-sizing: border-box;
-      background: rgba(32,33,35,0.95); /* litt kontrast mot bakgrunn */
-      border-radius: 0;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-    }
+button:hover {
+  background: #0d8c6c;
+}
 
-    /* Hvis du ønsker at footer-teksten skal være begrenset til samme bredde
-       som innholdet, kan vi legge til en wrapper inni footer og sette
-       max-width på den. Gi beskjed hvis du vil ha det slik. */
+/* Auth Box */
 
-    .auth-box h1 { text-align: center; margin-top: 0; }
-    .auth-box label { display: block; margin-bottom: 0.6em; }
-    .auth-box input { width: 100%; padding: 0.5em; border-radius: 6px; border: 1px solid #2f2f36; background: transparent; color: #fff; }
-    .auth-box .error { background: #7a2b2b; color: #fff; padding: 0.6em; border-radius: 6px; margin-bottom: 0.8em; }
+.auth-box {
+  background: #343541;
+  padding: 1.2em;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  margin: auto 0;
+}
 
-/* Header styles (moved from inline styles in header.php) */
+.auth-box h1 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.auth-box label {
+  display: block;
+  margin-bottom: 0.6em;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 0.5em;
+  border-radius: 6px;
+  border: 1px solid #2f2f36;
+  background: transparent;
+  color: #fff;
+}
+
+.auth-box .error {
+  background: #7a2b2b;
+  color: #fff;
+  padding: 0.6em;
+  border-radius: 6px;
+  margin-bottom: 0.8em;
+}
+
+/* Header */
+
 .site-header {
   width: 100%;
-  box-sizing: border-box;
   padding: 0.5rem 1rem;
 }
+
 .site-header__inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -164,35 +163,47 @@
   gap: 1rem;
   position: relative;
 }
+
 .site-brand {
   color: inherit;
   text-decoration: none;
   font-weight: 600;
-  /* Sentrer brand visuelt i header */
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
+
 .site-nav {
   display: flex;
   align-items: center;
-  margin-left: auto; /* plasser nav til høyre */
+  margin-left: auto;
 }
+
 .site-nav__link {
   color: inherit;
   text-decoration: none;
   margin-left: 0.8rem;
 }
 
-@media (max-width: 600px) {
-  /* På smale skjermer: gjør brand og nav flytende (ingen absolutt posisjon) */
-  .site-header__inner { padding-left: 0.5rem; padding-right: 0.5rem; }
-  .site-brand { position: static; transform: none; margin: 0 auto; }
-  .site-nav { margin-left: 0; margin-top: 0.4rem; }
-  .site-nav__link { margin-left: 0.5rem; }
+/* Footer */
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  width: 100%;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  color: #bfbfc6;
+  font-size: 0.9rem;
+  background: rgba(32,33,35,0.95);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
 }
 
-/* Utility button class for links that should look like real buttons */
+/* Buttons */
+
 .button {
   background: #10A37F;
   color: white !important;
@@ -206,11 +217,13 @@
   text-align: center;
   text-decoration: none;
 }
+
 .button:hover {
   background: #0d8c6c;
 }
 
-/* Admin related styles */
+/* Admin */
+
 .admin-badge {
   background: #c00;
   color: #fff;
@@ -222,8 +235,7 @@
 }
 
 .admin-notice {
-  /* Dark variant so banner matches site theme */
-  background: rgba(52,53,65,0.95); /* close to .auth-box / chat bg */
+  background: rgba(52,53,65,0.95);
   border: 1px solid rgba(255,255,255,0.04);
   padding: 0.5rem 1rem;
   margin: 0.75rem auto;
@@ -234,27 +246,51 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
-.greeting { margin-right: 0.6rem; }
-
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   border: 1px solid;
 }
+
 .admin-table thead tr {
-  /* Dark header to match site theme */
   background: rgba(32,33,35,0.95);
   text-align: left;
 }
-.admin-table th, .admin-table td {
+
+.admin-table th,
+.admin-table td {
   padding: 0.5rem;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   vertical-align: top;
-  color: #ECECF1; /* ensure light text in dark table */
-}
-.admin-table th {
-  font-weight: 700;
   color: #ECECF1;
 }
 
-.container { max-width: 1100px; margin: 1rem auto; padding: 0 1rem; }
+.admin-table th {
+  font-weight: 700;
+}
+
+/* Misc */
+
+.greeting {
+  margin-right: 0.6rem;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .site-header__inner {
+    padding: 0 0.5rem;
+  }
+  .site-brand {
+    position: static;
+    transform: none;
+    margin: 0 auto;
+  }
+  .site-nav {
+    margin-left: 0;
+    margin-top: 0.4rem;
+  }
+  .site-nav__link {
+    margin-left: 0.5rem;
+  }
+}

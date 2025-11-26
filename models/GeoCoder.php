@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../config.php';
 
+/**
+ * Finner koordinatene til et stedsnavn
+ */
 class Geocoder {
     public static function getCoordinates($place) {
         $url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($place);

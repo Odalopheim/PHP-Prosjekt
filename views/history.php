@@ -5,7 +5,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-$base = defined('BASE_URL') ? BASE_URL : rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
 
 // Hvis ikke innlogget: send til login-side via front controller
 if (empty($_SESSION['user_id'])) {
@@ -15,8 +14,10 @@ if (empty($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/../models/Conversation.php';
 $conversations = Conversation::getMessagesForUserById();
+
+require_once __DIR__ . '/header.php';
 ?>
-<?php include_once __DIR__ . '/header.php'; ?>
+
 
   <main style="width:100%;max-width:720px;margin:1rem auto;padding:0 1rem;box-sizing:border-box;">
     <h1>Dine tidligere samtaler</h1>
