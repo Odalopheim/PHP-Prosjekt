@@ -42,14 +42,15 @@ class User
         // Sett inn ny bruker
         $pdo = Database::connect();
         $stmt = $pdo->prepare("
-            INSERT INTO users (name, email, password_hash, created_at) 
-            VALUES (:name, :email, :password_hash, NOW())
+            INSERT INTO users (name, email, password_hash, role, created_at) 
+            VALUES (:name, :email, :password_hash, :role, NOW())
         ");
 
         return $stmt->execute([
             ':name'          => $name,
             ':email'         => $email,
-            ':password_hash' => $hash
+            ':password_hash' => $hash,
+            ':role' => $role
         ]);
     }
 
