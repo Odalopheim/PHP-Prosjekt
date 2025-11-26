@@ -24,7 +24,7 @@ class Auth
     }
 
     /**
-     * En liten hjelper for redirect med feilmelding
+     * Redirect med feilmelding
      */
     private static function redirectWithError(string $page, string $message): void
     {
@@ -54,6 +54,7 @@ class Auth
     {
         self::ensureSession();
 
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             self::redirectWithError('login', 'Ugyldig forespørsel.');
         }
@@ -62,6 +63,7 @@ class Auth
             self::redirectWithError('login', 'Sikkerhetsfeil. Last inn siden på nytt.');
         }
 
+        // validering av brukerinput
         $email = trim((string)($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
 
@@ -75,17 +77,16 @@ class Auth
 
         $user = User::verifyCredentials($email, $password);
 
-        // Sjekk om bruker er låst (User::verifyCredentials bør returnere string 'locked' ved sperring)
+        // Sjekk om bruker er låst 
         if ($user === 'locked') {
             self::redirectWithError('login', 'For mange mislykkede innloggingsforsøk. Bruker er midlertidig sperret.');
         }
 
         if ($user === false || !is_array($user)) {
-            // feil legitimasjon
             self::redirectWithError('login', 'Ugyldig e-post eller passord.');
         }
 
-        // Vellykket innlogging — harden session
+        // Vellykket innlogging
         session_regenerate_id(true);
 
         $_SESSION['user_id'] = $user['id'];
@@ -119,7 +120,7 @@ class Auth
         $email = trim((string)($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
 
-        // Basis validering
+        // Grunnleggende validering
         if ($name === '' || $email === '' || $password === '') {
             self::redirectWithError('register', 'Alle felt må fylles ut.');
         }
@@ -136,8 +137,8 @@ class Auth
             self::redirectWithError('register', 'Passord må være minst 8 tegn.');
         }
 
-        // Rolle: standard ved registrering. Admin-tilgang må settes manuelt i databasen av en administrator.
-        $role = 'Standard';
+        // Med @admin.no settes rolle til admin, hvis ikke settes til Standard
+        $role = self::isAdminEmail($email) ? 'Admin' : 'Standard';
 
         $register = User::register($name, $email, $password, $role);
         if (!$register) {
@@ -147,12 +148,12 @@ class Auth
         // Ved suksess, logg brukeren inn automatisk
         $user = User::verifyCredentials($email, $password);
         if ($user === false || $user === 'locked' || !is_array($user)) {
-            // Dette er uventet (bruker nettopp opprettet) — informer og send til login
-            $_SESSION['auth_message'] = 'Registrering lykkes. Logg inn med dine detaljer.';
+            $_SESSION['auth_message'] = 'Du er registrert!';
             header('Location: ../public/index.php?page=login');
             exit;
         }
 
+        //sette session data
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'] ?? '';
@@ -193,7 +194,6 @@ class Auth
 
     /**
      * Sjekk om e-post tilhører admin-domene.
-     * Merk: denne funksjonen brukes ikke for automatisk admin-tilordning i denne versjonen.
      */
     private static function isAdminEmail(string $email): bool
     {
@@ -201,7 +201,7 @@ class Auth
     }
 }
 
-// Enkel dispatcher slik at denne filen kan kalles direkte fra form action
+// Sender bruker til riktig handling etter brukers posisjon
 if (php_sapi_name() !== 'cli') {
     $action = $_GET['action'] ?? '';
 

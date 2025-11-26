@@ -6,7 +6,7 @@ require_once __DIR__ . '/../models/Conversation.php';
 class ChatBot
 {
     /**
-     * Hovedfunksjon: svar på brukerinput med værdata.
+     * Svar på brukerinput med værdata.
      */
     public function respond(string $input): string
     {
@@ -76,9 +76,8 @@ class ChatBot
     }
 
     /**
-     * Generer kandidat-strenger som kan representere et sted fra en setning.
-     * Prioriterer uttrykk etter preposisjoner og egennavn, deretter korte avslutninger,
-     * og som fallback hele setningen.
+     * Finne stedsnavn fra en setning. 
+     * Baserer seg på normal gramatikk.
      */
     private function generatePlaceCandidates(string $sentence): array
     {
@@ -86,27 +85,27 @@ class ChatBot
         $s = trim($sentence);
         if ($s === '') return $candidates;
 
-        // Normaliser mellomrom
+        // Fjerner duplikat mellomrom
         $s = preg_replace('/\s+/u', ' ', $s);
 
-        // Fjern spørsmålstegn/utrop fra slutten
+        // Fjern spørsmålstegn/utroptegn fra slutten
         $sClean = trim($s, " \t\n\r\0\x0B?!."); 
 
-        // Finn tekst etter vanlige preposisjoner
+        // Let etter stedsnavn etter vanlige preposisjoner
         if (preg_match_all('/\b(?:i|på|ved|til|inne\s+ved)\s+([^,?.!]+)/iu', $s, $matches)) {
             foreach ($matches[1] as $match) {
                 $candidates[] = $this->stripTimeWords($match);
             }
         }
 
-        // Finn egennavn (stor bokstav-sekvenser)
+        // Finn egennavn (sjekker etter storbokstav)
         if (preg_match_all('/\b[ÆØÅA-Z][a-zæøå\-]+(?:\s+[ÆØÅA-Z][a-zæøå\-]+)*/u', $s, $names)) {
             foreach ($names[0] as $n) {
                 $candidates[] = $this->stripTimeWords($n);
             }
         }
 
-        // Prøv siste to ord og siste ett ord
+        // Prøv siste to ord 
         $words = preg_split('/\s+/u', $sClean);
         $count = count($words);
 

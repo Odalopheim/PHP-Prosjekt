@@ -1,6 +1,5 @@
 <?php
 session_start();
-$base = defined('BASE_URL') ? BASE_URL : '/php/PHP-Prosjekt/public';
 
 if (!empty($_SESSION['user_id'])) {
     header('Location: ' . $base . '/index.php?page=chatbot');
@@ -13,9 +12,10 @@ if (empty($_SESSION['csrf'])) {
 
 $error = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_error']);
+require_once __DIR__ . '/header.php';
 ?>
 
-<?php include_once __DIR__ . '/header.php'; ?>
+
 
 <div class="auth-box">
     <h1>Registrer ny bruker</h1>
@@ -33,7 +33,7 @@ unset($_SESSION['auth_error']);
         <button type="submit">Registrer</button>
     </form>
 
-    <p>Allerede bruker? <a href="<?= htmlspecialchars($base) ?>/index.php?page=login">Logg inn</a></p>
+    <p>Allerede bruker? <a href="<?= htmlspecialchars($base) ?>/index.php?page=login"class="button">Logg inn</a></p>
 </div>
 
 <?php include_once __DIR__ . '/footer.php'; ?>

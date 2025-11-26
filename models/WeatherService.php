@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../config.php';
 
 class WeatherService {
-    //hetner værdata fra MET API basert på latitude og longitude
+    //henter værdata fra MET API basert på latitude og longitude
     public static function getWeather($lat, $lon) {
         $url = MET_API_URL . "?lat=$lat&lon=$lon";
         
@@ -16,21 +16,19 @@ class WeatherService {
         // Oppretter kontekst for HTTP-forespørselen med headeren
         $context = stream_context_create($opts);
 
-        // Henter JSON-data fra MET API-et
+        // Henter JSON-data fra MET API-et og assosiativ array
         $json = file_get_contents($url, false, $context);
-
-        // Dekoder JSON-responsen til en assosiativ array
         $data = json_decode($json, true);
 
-        // Returnerer null hvis ingen data eller feil struktur i svaret
+        //sjekk at data eksiterer
         if (!$data || !isset($data['properties']['timeseries'][0])) return null;
 
-        // Henter de siste tilgjengelige værmålingene fra API-responsen
+        // Henter de siste værmålingene fra API-responsen
         $now = $data['properties']['timeseries'][0]['data']['instant']['details'];
 
-        // Returnerer et array med temperatur, vind og luftfuktighet
+        // Returnerer et array med svar
         return [
-            'temperature' => $now['air_temperature'] ?? 'Ukjent', // Hvis ikke funnet, returner 'Ukjent'
+            'temperature' => $now['air_temperature'] ?? 'Ukjent', 
             'wind' => $now['wind_speed'] ?? 'Ukjent',
             'humidity' => $now['relative_humidity'] ?? 'Ukjent'
         ];

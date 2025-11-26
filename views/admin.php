@@ -1,18 +1,18 @@
 <?php
-require_once __DIR__ . '/header.php';
 require_once __DIR__ . '/../models/Conversation.php';
 // Enkel admin-side for å se alle meldinger
-if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) 
+  session_start();
 
-// Sjekk admin
+// Sjekk om bruker er admin
 if (empty($_SESSION['is_admin'])) {
-    // Ikke autorisert
     http_response_code(403);
     echo "<h2>Ikke autorisert</h2><p>Du må være administrator for å se denne siden.</p>";
     exit;
 }
 
 $messages = Conversation::getAllMessages();
+require_once __DIR__ . '/header.php';
 ?>
 <div class="container">
   <h2>Alle meldinger sendt inn</h2>

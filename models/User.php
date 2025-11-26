@@ -26,7 +26,6 @@ class User
      */
     public static function register(string $name, string $email, string $password, string $role): bool
     {
-        // Enkel validering
         if (empty($name) || empty($email) || empty($password)) {
             return false;
         }
@@ -36,10 +35,8 @@ class User
             return false;
         }
 
-        // Hash passord
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        // Sett inn ny bruker
         $pdo = Database::connect();
         $stmt = $pdo->prepare("
             INSERT INTO users (name, email, password_hash, role, created_at) 
@@ -50,7 +47,7 @@ class User
             ':name'          => $name,
             ':email'         => $email,
             ':password_hash' => $hash,
-            ':role' => $role
+            ':role'          => $role
         ]);
     }
 
@@ -66,7 +63,7 @@ class User
             return false;
         }
 
-        // Sjekk mislykkede forsøk (hvis kolonnene finnes)
+        // Sjekk mislykkede forsøk 
         $failedAttempts = isset($user['failed_attempts']) ? (int)$user['failed_attempts'] : 0;
         $lastFailed     = $user['last_failed'] ?? null;
 

@@ -1,16 +1,11 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Auto-deteksjon av BASE_URL (peker til /.../public)
 $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
 define('BASE_URL', $scriptDir);
 
-// Hvitliste over sider som har egne kontrollere
+// ver sider som har egne kontrollere
 $controllerPages = ['chatbot', 'auth'];
-
-// Liste over statiske visninger
-$viewPages = ['login', 'register', 'chatbot', 'history', 'admin_messages'];
+$viewPages = ['login', 'register', 'chatbot', 'history', 'admin'];
 
 // Bestem hvilken side som skal lastes
 $page = 'chatbot';
@@ -21,15 +16,14 @@ if (!empty($_GET['page'])) {
     }
 }
 
-// Først: hvis det finnes en view-fil, inkluder den direkte (det er enklest
-// og kompatibelt med prosjektstrukturen hvor views/* finnes).
+// Sjekk om det finnes en view-fil, inkluder den direkte 
 $viewPath = __DIR__ . "/../views/{$page}.php";
 if (file_exists($viewPath)) {
     require_once $viewPath;
     return;
 }
 
-// Hvis ikke view finnes, prøv å finne en controller i ../controllers eller ../app/controllers
+// Hvis ikke view finnes, prøv å finne en controller
 $className = ucfirst($page);
 $controllerPaths = [
     __DIR__ . "/../controllers/{$className}.php",
