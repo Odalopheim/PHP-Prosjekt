@@ -15,7 +15,7 @@ if (empty($_SESSION['is_admin'])) {
 $messages = Conversation::getAllMessages();
 ?>
 <div class="container">
-  <h2>Meldinger mottatt</h2>
+  <h2>Alle meldinger sendt inn</h2>
   <p>Totalt: <?= count($messages) ?> meldinger</p>
    <table class="admin-table">
     <thead>
@@ -29,8 +29,8 @@ $messages = Conversation::getAllMessages();
     <tbody>
     <?php foreach ($messages as $m): ?>
       <tr>
-        <td><?= htmlspecialchars($m['created_at'] ?? '') ?></td>
-        <td><?= htmlspecialchars($m['user_email'] ?? '—') ?></td>
+        <td><?= htmlspecialchars($m['created_at']) ?></td>
+        <td><?= htmlspecialchars($m['user_email']) ?></td>
         <td><?= nl2br(htmlspecialchars($m['user_input'])) ?></td>
         <td><?= nl2br(htmlspecialchars($m['bot_response'])) ?></td>
       </tr>
