@@ -32,13 +32,13 @@ require_once __DIR__ . '/../models/Conversation.php';
 $bot = new ChatBot();
 $input = '';
 
-// Hent noen tidligere meldinger for visning i chatten (admins ser alle)
+//Hent noen tidligere meldinger for visning i chatten (admins ser alle)
 if (!empty($_SESSION['is_admin'])) {
   $conversations = Conversation::getAllMessages();
 } else {
-  $uid = $_SESSION['user_id'] ?? null;
+  $uid = $_SESSION['user_email'] ?? null;
   if ($uid) {
-    $conversations = Conversation::getMessagesForUserById((int)$uid);
+    $conversations = Conversation::getMessagesForUserById($uid);
   } else {
     $conversations = [];
   }
@@ -51,7 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Sanitize input
-    $input = filter_input(INPUT_POST, 'sted', FILTER_SANITIZE_STRING);
+    $input = filter_input(INPUT_POST, 'sted', FILTER_SANITIZE_SPECIAL_CHARS);
+
 }
 
 $response = $input ? $bot->respond($input) : "Hei! Skriv inn et sted, så forteller jeg deg været der.";

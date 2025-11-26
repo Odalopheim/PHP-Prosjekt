@@ -24,7 +24,7 @@ class User
     /**
      * Registrer en ny bruker.
      */
-    public static function register(string $name, string $email, string $password, enum $role): bool
+    public static function register(string $name, string $email, string $password, string $role): bool
     {
         // Enkel validering
         if (empty($name) || empty($email) || empty($password)) {
