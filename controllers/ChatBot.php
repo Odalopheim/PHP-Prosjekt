@@ -15,21 +15,12 @@ class ChatBot
             return "Skriv inn et sted for å få værdata.";
         }
 
-        // Generer kandidat-strenger fra setningen og prøv disse mot geokoder-APIet
+        // Finn koordinater fra kandidatene
         $candidates  = $this->generatePlaceCandidates($s);
         $coords      = null;
         $foundPlace  = null;
 
-        $maxAttempts = 5;
-        $attempts    = 0;
-
         foreach ($candidates as $candidate) {
-            $candidate = trim($candidate);
-            if ($candidate === '') continue;
-
-            $attempts++;
-            if ($attempts > $maxAttempts) break;
-
             $coords = GeoCoder::getCoordinates($candidate);
             if ($coords) {
                 $foundPlace = $candidate;
@@ -41,43 +32,54 @@ class ChatBot
             return "Beklager, men hvilket sted mener du?";
         }
 
-        // Hent værdata
+        
         $weather = WeatherService::getWeather($coords['lat'], $coords['lon']);
         if (!$weather) {
             return "Kunne ikke hente værdata for {$foundPlace}.";
         }
 
-        // Lag svaret (bruk det funnede sted-navnet)
+       
         $responsePlace = $foundPlace ?? $s;
-        $response = sprintf(
-            "Været i %s nå: %s°C, vind: %s m/s, fuktighet: %s%%.",
-            $responsePlace,
-            $weather['temperature'],
-            $weather['wind'],
-            $weather['humidity']
-        );
-
-        // Lagre samtalen i databasen (inkluder e-post hvis bruker er logget inn)
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-
-        $userEmail = $_SESSION['user_email'] ?? null;
-        if ($userEmail) {
-            $GLOBALS['__conversation_user_email'] = $userEmail;
-        }
+        $response      = $this->generateWeatherResponse($s, $responsePlace, $weather);
 
         Conversation::saveMessage($responsePlace, $response);
-
-        // Rydd opp global variabel
-        unset($GLOBALS['__conversation_user_email']);
 
         return $response;
     }
 
     /**
-     * Finne stedsnavn fra en setning. 
-     * Baserer seg på normal gramatikk.
+     * Generer svaret basert på hva brukeren spør om.
+     */
+    private function generateWeatherResponse(string $input, string $place, array $weather): string
+    {
+        $lowerInput = mb_strtolower($input);
+
+        if (preg_match('/regn|regner|regner det/i', $lowerInput)) {
+            $rainInfo = $weather['rain'] ?? null;
+            return $rainInfo
+                ? "Ja, det regner i {$place} nå."
+                : "Nei, det regner ikke i {$place} nå.";
+        }
+
+        if (preg_match('/temperatur|varmt|kaldt/i', $lowerInput)) {
+            $temp = $weather['temperature'];
+            if ($temp < 5) {
+                return sprintf("Temperaturen i %s er %s°C, det er kaldt.", $place, $temp);
+            }
+            return sprintf("Temperaturen i %s er %s°C.", $place, $temp);
+        }
+
+        return sprintf(
+            "Været i %s nå: %s°C, vind: %s m/s, fuktighet: %s%%.",
+            $place,
+            $weather['temperature'],
+            $weather['wind'],
+            $weather['humidity']
+        );
+    }
+
+    /**
+     * Finne stedsnavn fra en setning.
      */
     private function generatePlaceCandidates(string $sentence): array
     {
