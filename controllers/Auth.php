@@ -55,9 +55,9 @@ class Auth
         
         // Bestem rolle fra epost
         $role = self::isAdminEmail($email) ? 'Admin' : 'Standard';
-        
-        $ok = User::register($name, $email, $password, $role);
-        if ($ok) {
+        // Registrer bruker
+        $register = User::register($name, $email, $password, $role);
+        if ($register) {
             // Automatisk innlogging etter registrering
             $user = User::verifyCredentials($email, $password);
             $_SESSION['user_id'] = $user['id'];
