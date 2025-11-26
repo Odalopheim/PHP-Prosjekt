@@ -14,7 +14,7 @@ if (empty($_SESSION['user_id'])) {
 }
 
 require_once __DIR__ . '/../models/Conversation.php';
-$conversations = Conversation::getAllMessages();
+$conversations = Conversation::getMessagesForUserById();
 ?>
 <?php include_once __DIR__ . '/header.php'; ?>
 

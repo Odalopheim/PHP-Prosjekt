@@ -29,8 +29,8 @@ $messages = Conversation::getAllMessages();
     <tbody>
     <?php foreach ($messages as $m): ?>
       <tr>
-        <td><?= htmlspecialchars($m['created_at'] ?? '') ?></td>
-        <td><?= htmlspecialchars($m['user_email'] ?? '—') ?></td>
+        <td><?= htmlspecialchars($m['created_at']) ?></td>
+        <td><?= htmlspecialchars($m['user_email']) ?></td>
         <td><?= nl2br(htmlspecialchars($m['user_input'])) ?></td>
         <td><?= nl2br(htmlspecialchars($m['bot_response'])) ?></td>
       </tr>
