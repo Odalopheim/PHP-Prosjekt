@@ -245,6 +245,10 @@ button:hover {
    color:#856404;
 }
 
+.greeting {
+   margin-right:0.6rem;
+}
+
 /* Footer */
 
 .footer {
