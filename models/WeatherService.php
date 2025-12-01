@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config.php';
 
 class WeatherService {
     // Henter værdata fra MET API basert på latitude og longitude nå 
+
     public static function getWeather($lat, $lon) {
         $url = MET_API_URL . "?lat=$lat&lon=$lon";
         
@@ -15,6 +16,9 @@ class WeatherService {
         $context = stream_context_create($opts);
         $json = file_get_contents($url, false, $context);
         $data = json_decode($json, true);
+
+
+        // Sjekk at data eksiterer
 
         if (!$data || !isset($data['properties']['timeseries'][0])) return null;
 

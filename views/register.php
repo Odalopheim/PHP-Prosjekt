@@ -15,8 +15,6 @@ unset($_SESSION['auth_error']);
 require_once __DIR__ . '/header.php';
 ?>
 
-
-
 <div class="auth-box">
     <h1>Registrer ny bruker</h1>
 

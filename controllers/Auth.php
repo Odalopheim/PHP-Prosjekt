@@ -137,6 +137,10 @@ class Auth
             self::redirectWithError('register', 'Passord må være minst 8 tegn.');
         }
 
+        if (preg_match_all('/\d/', $password) < 2) {
+            self::redirectWithError('register', 'Passord må inneholde minst 2 tall');
+        }
+
         // Med @admin.no settes rolle til admin, hvis ikke settes til Standard
         $role = self::isAdminEmail($email) ? 'Admin' : 'Standard';
 
