@@ -1,8 +1,6 @@
-# PHP-Prosjekt
-
 
 # PHP-Prosjekt
-Models (modell)
+Models
 </br>
 Hva det er:
 Her ligger all logikken for data og regler.
