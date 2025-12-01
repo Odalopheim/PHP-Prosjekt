@@ -3,7 +3,7 @@
 $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/');
 define('BASE_URL', $scriptDir);
 
-// ver sider som har egne kontrollere
+// hver sider som har egne kontrollere
 $controllerPages = ['chatbot', 'auth'];
 $viewPages = ['login', 'register', 'chatbot', 'history', 'admin'];
 
