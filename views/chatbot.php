@@ -23,7 +23,7 @@ require_once __DIR__ . '/header.php';
 require_once __DIR__ . '/../controllers/ChatBot.php';
 require_once __DIR__ . '/../models/Conversation.php';
 
-$bot = new ChatBot();
+$bot = new ChatBotService();
 $input = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
