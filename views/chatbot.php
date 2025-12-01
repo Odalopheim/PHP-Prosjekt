@@ -10,8 +10,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // CSRF token
-if (empty($_SESSION['csrf_token'])) {
-  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['csrf'])) {
+  $_SESSION['csrf'] = bin2hex(random_bytes(32));
 }
 
 if (empty($_SESSION['user_id'])) {
@@ -21,14 +21,13 @@ if (empty($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/header.php';
 require_once __DIR__ . '/../controllers/ChatBot.php';
-require_once __DIR__ . '/../models/Conversation.php';
 
 $bot = new ChatBotService();
 $input = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF verification
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'] ?? '')) {
         die("Invalid CSRF token");
     }
 
@@ -54,12 +53,11 @@ $response = $input ? $bot->respond($input) : "Hei! Skriv inn et sted, så fortel
         <?php endif; ?>
       </div>
     <form method="post">
-      <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+      <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
       <input type="text" name="sted" placeholder="Skriv inn sted..." autofocus>
       <button>Send</button>
     </form>
   </div>
-  <script src="<?= \htmlspecialchars($base) ?>/js/script.js"></script>
 <?php
 include_once __DIR__ . '/footer.php';
 ?>

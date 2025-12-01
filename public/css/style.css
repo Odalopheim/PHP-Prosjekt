@@ -234,6 +234,17 @@ button:hover {
   margin-left: 0.8rem;
 }
 
+.admin-notice {
+   background:#fff3cd;
+   border:1px solid #ffeeba;
+   padding:0.5rem 1rem;
+   margin:0.75rem auto;
+   width:calc(100% - 2rem);
+   max-width:1000px;
+   border-radius:4px;
+   color:#856404;
+}
+
 /* Footer */
 
 .footer {
