@@ -25,10 +25,12 @@ class ChatBot
 
         foreach ($candidates as $candidate) {
             $candidate = trim($candidate);
-            if ($candidate === '') continue;
+            if ($candidate === '') 
+                continue;
 
             $attempts++;
-            if ($attempts > $maxAttempts) break;
+            if ($attempts > $maxAttempts) 
+                break;
 
             $coords = GeoCoder::getCoordinates($candidate);
             if ($coords) {
@@ -82,24 +84,25 @@ class ChatBot
     private function generatePlaceCandidates(string $sentence): array
     {
         $candidates = [];
-        $s = trim($sentence);
-        if ($s === '') return $candidates;
+        $place = trim($sentence);
+        if ($place === '') 
+            return $candidates;
 
         // Fjerner duplikat mellomrom
-        $s = preg_replace('/\s+/u', ' ', $s);
+        $place = preg_replace('/\s+/u', ' ', $place);
 
         // Fjern spørsmålstegn/utroptegn fra slutten
-        $sClean = trim($s, " \t\n\r\0\x0B?!."); 
+        $sClean = trim($place, " \t\n\r\0\x0B?!."); 
 
         // Let etter stedsnavn etter vanlige preposisjoner
-        if (preg_match_all('/\b(?:i|på|ved|til|inne\s+ved)\s+([^,?.!]+)/iu', $s, $matches)) {
+        if (preg_match_all('/\b(?:i|på|ved|til|inne\s+ved)\s+([^,?.!]+)/iu', $place, $matches)) {
             foreach ($matches[1] as $match) {
                 $candidates[] = $this->stripTimeWords($match);
             }
         }
 
         // Finn egennavn (sjekker etter storbokstav)
-        if (preg_match_all('/\b[ÆØÅA-Z][a-zæøå\-]+(?:\s+[ÆØÅA-Z][a-zæøå\-]+)*/u', $s, $names)) {
+        if (preg_match_all('/\b[ÆØÅA-Z][a-zæøå\-]+(?:\s+[ÆØÅA-Z][a-zæøå\-]+)*/u', $place, $names)) {
             foreach ($names[0] as $n) {
                 $candidates[] = $this->stripTimeWords($n);
             }
@@ -125,7 +128,8 @@ class ChatBot
 
         foreach ($candidates as $c) {
             $c = trim($c, " \t\n\r\0\x0B,.;:!?\"'()");
-            if ($c === '') continue;
+            if ($c === '') 
+                continue;
 
             $key = mb_strtolower($c);
             if (!isset($seen[$key])) {

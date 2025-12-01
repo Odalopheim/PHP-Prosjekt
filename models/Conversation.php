@@ -33,7 +33,6 @@ class Conversation
     
             return true;
         } catch (Exception $e) {
-            // Du kan logge feilen her: error_log($e->getMessage());
             return false;
         }
     }
@@ -61,7 +60,7 @@ class Conversation
     /**
      * Viser egen historie til bruker
      */
-    public static function getMessagesForUserById(): array {
+    public static function getMessagesForUserByEmail(): array {
 
         $db = Database::connect();
 

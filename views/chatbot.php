@@ -42,18 +42,17 @@ $response = $input ? $bot->respond($input) : "Hei! Skriv inn et sted, så fortel
   <div class="chat">
     <h1>Værassistent</h1>
       <div class="messages">
-       
-  <!-- Knapp som går til historikk-siden -->
-  <a id="showPrev" class="button" href="<?= htmlspecialchars($base) ?>/index.php?page=history">Vis tidligere samtaler</a>
+        <!-- Knapp som går til historikk-siden -->
+        <a id="showPrev" class="button" href="<?= htmlspecialchars($base) ?>/index.php?page=history">Vis tidligere samtaler</a>
 
-  <!-- Nåværende melding -->
-  <?php if ($input): ?>
-    <div class="msg user"><?= htmlspecialchars($input) ?></div>
-    <div class="msg bot"><?= htmlspecialchars($response) ?></div>
-  <?php else: ?>
-    <div class="msg bot"><?= htmlspecialchars($response) ?></div>
-  <?php endif; ?>
-  </div>
+        <!-- Nåværende melding -->
+        <?php if ($input): ?>
+          <div class="msg user"><?= htmlspecialchars($input) ?></div>
+          <div class="msg bot"><?= htmlspecialchars($response) ?></div>
+        <?php else: ?>
+          <div class="msg bot"><?= htmlspecialchars($response) ?></div>
+        <?php endif; ?>
+      </div>
     <form method="post">
       <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
       <input type="text" name="sted" placeholder="Skriv inn sted..." autofocus>
