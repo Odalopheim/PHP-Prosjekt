@@ -27,8 +27,7 @@ class Conversation
             $stmt->execute([
                 ':user_input' => $userInput,
                 ':bot_response' => $botResponse,
-                // Vi bruker en global variabel som settes av kallet som ønsker å lagre epost
-                ':user_email' => $GLOBALS['__conversation_user_email'] ?? null
+                ':user_email' => $_SESSION['user_email'] ?? null
                 ]);
     
             return true;

@@ -45,7 +45,7 @@ class ChatBotService
         }
 
         // Generer svar
-        $responsePlace = $foundPlace; // ✅ bruk kun stedsnavn uten tidsuttrykk
+        $responsePlace = $foundPlace;
         $response = $this->generateWeatherResponse($s, $responsePlace, $weather, $offsetHours);
 
         // Lagre samtale
@@ -60,7 +60,7 @@ class ChatBotService
     private function generateWeatherResponse(string $input, string $place, array $weather, int $offsetHours = 0): string
     {
         $lowerInput = mb_strtolower($input);
-        $tidspunkt = $offsetHours === 24 ? "i morgen" : "i dag"; // ✅ hele uttrykket
+        $tidspunkt = $offsetHours === 24 ? "i morgen" : "i dag"; 
 
         // Regn
         if (preg_match('/regn|regner|regner det/i', $lowerInput)) {

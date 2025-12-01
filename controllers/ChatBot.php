@@ -5,6 +5,6 @@ class ChatController {
     public function handleRequest(string $input) {
         $chatService = new ChatBotService();
         $response = $chatService->respond($input);
-        include __DIR__ . '/../views/chatView.php';
+        include __DIR__ . '/../views/chatbot.php';
     }
 }
