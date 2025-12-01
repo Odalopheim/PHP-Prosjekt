@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../models/Conversation.php';
+require_once __DIR__ . '/../controllers/ChatBot.php';
 // Enkel admin-side for å se alle meldinger
 if (session_status() !== PHP_SESSION_ACTIVE) 
   session_start();

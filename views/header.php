@@ -43,7 +43,7 @@ $currentPage = $_GET['page'] ?? '';
       </div>
     </header>
   <?php if (!empty($_SESSION['admin_notice'])): ?>
-    <div class="admin-notice" style="background:#fff3cd;border:1px solid #ffeeba;padding:0.5rem 1rem;margin:0.75rem auto;width:calc(100% - 2rem);max-width:1000px;border-radius:4px;color:#856404;">
+    <div class="admin-notice">
       <?= htmlspecialchars($_SESSION['admin_notice']) ?>
     </div>
     <?php unset($_SESSION['admin_notice']); ?>

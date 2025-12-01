@@ -16,11 +16,6 @@ class Conversation
         try {
             $db = Database::connect();
 
-            // Bygg dynamisk INSERT basert på hvilke kolonner som finnes
-            $columns = ['user_input', 'bot_response'];
-            $placeholders = [':user_input', ':bot_response'];
-            $params = [':user_input' => $userInput, ':bot_response' => $botResponse];
-
             $stmt = $db->prepare(
                 "INSERT INTO conversations (user_input, bot_response, user_email) 
                 VALUES (:user_input, :bot_response, :user_email)");
@@ -43,9 +38,6 @@ class Conversation
     {
         $db = Database::connect();
 
-        $isAdmin = $_SESSION['is_admin'] ?? false;
-
-        if ($isAdmin) {
         $sql = "SELECT user_input, bot_response, user_email, created_at
                 FROM conversations
                 ORDER BY created_at DESC";
@@ -53,7 +45,7 @@ class Conversation
         $stmt = $db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+
     return [];
 }   
     /**

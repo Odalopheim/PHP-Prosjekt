@@ -38,7 +38,6 @@ class Auth
      */
     private static function validateCsrf(): bool
     {
-        // Forutsetter at skjemaet sender feltet "csrf" og at token er generert i visningen
         $tokenSession = $_SESSION['csrf'] ?? '';
         $tokenPost = $_POST['csrf'] ?? '';
         if (empty($tokenSession) || empty($tokenPost)) {

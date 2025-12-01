@@ -12,7 +12,7 @@ if (empty($_SESSION['user_id'])) {
     exit;
 }
 
-require_once __DIR__ . '/../models/Conversation.php';
+require_once __DIR__ . '/../controllers/ChatBot.php';
 $conversations = Conversation::getMessagesForUserByEmail();
 
 require_once __DIR__ . '/header.php';

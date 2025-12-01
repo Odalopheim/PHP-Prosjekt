@@ -28,6 +28,7 @@ require_once __DIR__ . '/header.php';
         <label>Navn<br><input type="text" name="name" required></label><br>
         <label>E-post<br><input type="email" name="email" required></label><br>
         <label>Passord<br><input type="password" name="password" required></label><br>
+        <input type="hidden" name="honeypot" value="">
         <button type="submit">Registrer</button>
     </form>
 
