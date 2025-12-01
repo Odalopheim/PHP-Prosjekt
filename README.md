@@ -1,71 +1,44 @@
-# PHP-Prosjekt
+# Værassistent - PHP Chatbot
 
+En PHP-basert chatbot som gir deg værinformasjon for et hvilket som helst sted i Norge og verden. Applikasjonen bruker [MET API](https://api.met.no/) for værdata.
 
-# PHP-Prosjekt
-Models (modell)
-</br>
-Hva det er:
-Her ligger all logikken for data og regler.
+## Funksjoner
 
-Hva du legger her:
+- **Værspørringer**: Spør om været for et sted, og få informasjon om temperatur, vind, fuktighet og nedbør.
+- **Naturlig språk**: Støtter spørsmål som "Regner det i Oslo?" eller "Hvordan er temperaturen i Bergen i morgen?"
+- **Brukerautentisering**: Registrer deg og logg inn for å bruke tjenesten.
+- **Samtalehistorikk**: Se tidligere samtaler og værspørringer.
 
-Klasser som beskriver hvordan dataen ser ut (for eksempel en User, Product, Post, osv.)
+## Prosjektstruktur
 
-Kobling mot databasen (tabeller, relasjoner).
+Applikasjonen følger MVC-arkitektur (Model-View-Controller):
 
-Funksjoner for å hente, lagre, oppdatere og slette data.
+```
+├── config.php          # Konfigurasjon og miljøvariabler
+├── controllers/        # Kontrollere for forretningslogikk
+├── models/             # Databasemodeller og datalagring
+├── services/           # Tjenester for vær-API og geokoding
+├── views/              # HTML-maler og brukergrensesnitt
+└── public/             # Statiske filer (CSS, bilder) og index.php
+```
 
-Kort sagt:
-Alt som handler om data og forretningslogikk
-</br>
-Views
+## Installasjon
 
-Dette er det brukeren ser – altså grensesnittet (HTML-sider eller JSON-data for API).
+### Forutsetninger
 
-Hva du legger her:
+- PHP 7.4 eller nyere
+- MySQL/MariaDB database
+- Webserver (Apache, Nginx eller innebygd PHP-server)
 
-HTML-filer (maler/templates)
+### Oppsett
 
-Presentasjonslogikk (hvordan data vises)
+1. **Klon prosjektet** og naviger til mappen.
 
-Kort sagt:
-Alt som handler om utseende og presentasjon.
-</br>
-Controllers (kontrollere)
+2. **Opprett database** med navn `chatbot` (eller oppdater `.env` med egne innstillinger).
 
-Hva det er:
-Koblingen mellom brukeren og modellene.
+3. **Kjør SQL for å opprette tabeller:**
 
-Hva du legger her:
-
-Funksjoner som tar imot forespørsler (requests)
-
-Henter data fra modellene
-
-Sender data til riktige views
-
-Kort sagt:
-Alt som handler om flyt og logikk mellom bruker, data og visning.
-
-Public (eller static / wwwroot)
-
-Hva det er:
-Dette er filer som alle kan nå direkte i nettleseren.
-
-Hva du legger her:
-
-Bilder (.png, .jpg)
-
-CSS-filer (stil)
-
-JavaScript-filer (klientkode)
-
-Ikoner, fonter, osv.
-
-Kort sagt:
-Alt som er statisk innhold tilgjengelig for brukeren. 
-
-
+```sql
 CREATE TABLE conversations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_input TEXT NOT NULL,
@@ -73,7 +46,6 @@ CREATE TABLE conversations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Brukertabell for autentisering
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
@@ -81,8 +53,30 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
 
-Instruksjoner:
-- Opprett databasen som `chatbot` eller oppdater `models/Database.php` med egne DB-innstillinger.
-- Kjør SQL-en over for å lage `conversations` og `users` tabellene.
+4. **Konfigurer `.env`-filen** med databaseinnstillinger:
+
+```
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=chatbot
+DB_USER=root
+DB_PASS=ditt_passord
+```
+
+5. **Start webserveren** og åpne `public/index.php` i nettleseren.
+
+## Bruk
+
+1. Registrer deg eller logg inn.
+2. Skriv inn et stedsnavn i chatvinduet, f.eks. "Oslo" eller "Hvordan er været i Trondheim?".
+3. Chatboten svarer med aktuell værinformasjon.
+
+## Teknologier
+
+- PHP (MVC-arkitektur)
+- MySQL/MariaDB
+- [MET API](https://api.met.no/) for værdata
+- [Nominatim](https://nominatim.org/) for geokoding
 
