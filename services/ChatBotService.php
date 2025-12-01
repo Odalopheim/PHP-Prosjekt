@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../models/GeoCoder.php';
-require_once __DIR__ . '/../models/WeatherService.php';
-require_once __DIR__ . '/../models/Conversation.php';
+require_once __DIR__ . '/../services/GeoCoder.php';
+require_once __DIR__ . '/../services/WeatherService.php';
+
 
 class ChatBotService
 {
@@ -32,10 +32,10 @@ class ChatBotService
             return "Beklager, men hvilket sted mener du?";
         }
 
-        // Bestem om brukeren spør om i dag eller i morgen
+        // Bestem dag
         $offsetHours = 0;
         if (preg_match('/i morgen|imorgen/i', mb_strtolower($s))) {
-            $offsetHours = 24; // 24 timer frem
+            $offsetHours = 24;
         }
 
         // Hent værdata
@@ -45,14 +45,9 @@ class ChatBotService
         }
 
         // Generer svar
-        $responsePlace = $foundPlace;
-        $response = $this->generateWeatherResponse($s, $responsePlace, $weather, $offsetHours);
-
-        // Lagre samtale
-        Conversation::saveMessage($responsePlace, $response);
-
-        return $response;
+        return $this->generateWeatherResponse($s, $foundPlace, $weather, $offsetHours);
     }
+
 
     /**
      * Generer svaret basert på hva brukeren spør om.

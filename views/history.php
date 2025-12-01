@@ -1,10 +1,9 @@
 <?php
 // Vis tidligere samtaler
-// Sjekk session og hent meldinger fra modellen før output
+// Sjekk session
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
-
 
 // Hvis ikke innlogget: send til login-side via front controller
 if (empty($_SESSION['user_id'])) {
@@ -13,9 +12,8 @@ if (empty($_SESSION['user_id'])) {
 }
 
 require_once __DIR__ . '/../controllers/ChatBot.php';
-$conversations = Conversation::getMessagesForUserByEmail();
-
 require_once __DIR__ . '/header.php';
+$conversations = Conversation::getMessagesForUserByEmail();
 ?>
 
   <main class="main-history">

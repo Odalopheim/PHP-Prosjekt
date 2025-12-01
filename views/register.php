@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Hvis allerede logget inn, send til index via front controller
 if (!empty($_SESSION['user_id'])) {
     header('Location: ' . $base . '/index.php?page=chatbot');
     exit;
@@ -10,8 +11,10 @@ if (empty($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(32));
 }
 
+// Hent og fjerne eventuell feil
 $error = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_error']);
+
 require_once __DIR__ . '/header.php';
 ?>
 

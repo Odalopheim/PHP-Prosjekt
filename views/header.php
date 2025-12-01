@@ -22,7 +22,7 @@ $currentPage = $_GET['page'] ?? '';
       <nav class="site-nav">
         <!-- sjekker om man er innlogget som bestemmer header -->
         <?php if ($isLoggedIn): ?>
-          <span class="greeting" style="margin-right:0.6rem;">Hei, <?= $userName ?></span>
+          <span class="greeting">Hei, <?= $userName ?></span>
           <?php if (!empty($_SESSION['is_admin'])): ?>
             <span class="admin-badge" title="Administrator">Admin</span>
           <?php endif; ?>

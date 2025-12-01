@@ -11,13 +11,14 @@ if (empty($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(32));
 }
 
-// Hent og tøm eventuell feil
+// Hent og fjerne eventuell feil
 $error = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_error']);
 
-// Hent og tøm eventuell innloggingfeil
+// Hent og fjerne eventuell innloggingfeil
 $message = $_SESSION['auth_message'] ?? '';
 unset($_SESSION['auth_message']);
+
 require_once __DIR__ . '/header.php';
 ?>
 
