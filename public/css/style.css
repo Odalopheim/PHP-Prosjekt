@@ -107,6 +107,7 @@ button {
 button:hover {
   background: #0d8c6c;
 }
+
 /* History */
 
 .main-history {
@@ -137,11 +138,23 @@ button:hover {
 .msg-history {
   background: #10A37F;
   color: white;
+  padding: 0.75em 1em;
+  border-radius: 10px;
+  max-width: 85%;
+  line-height: 1.4;
+  word-wrap: break-word;
+  display: inline-block;
 }
 
 .user-history{
   background: #444654;
   color: #ECECF1;
+  padding: 0.75em 1em;
+  border-radius: 10px;
+  max-width: 85%;
+  line-height: 1.4;
+  word-wrap: break-word;
+  display: inline-block;
 }
 
 /* Auth Box */
