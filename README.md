@@ -76,7 +76,7 @@ DB_PASS=ditt_passord
 ## Teknologier
 
 - PHP (MVC-arkitektur)
-- MySQL/MariaDB
+- MySQL
 - [MET API](https://api.met.no/) for værdata
 - [Nominatim](https://nominatim.org/) for geokoding
 
